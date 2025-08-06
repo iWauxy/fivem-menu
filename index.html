@@ -10,30 +10,16 @@
             box-sizing: border-box;
         }
         
-        html {
-            background: transparent !important;
-            overflow: hidden;
-        }
-        
-        body {
+        html,         body {
             margin: 0;
             padding: 0;
-            background: transparent !important;
+            background: none !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
             overflow: hidden;
-            /* Macho DUI için ekstra şeffaflık ayarları */
+            /* Macho DUI için tamamen şeffaf */
             -webkit-app-region: no-drag;
-            background-color: transparent !important;
-        }
-        
-        body::before,
-        body::after {
-            display: none !important;
+            width: 100vw;
+            height: 100vh;
         }
         
         .menu-container {
@@ -46,7 +32,10 @@
             backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             overflow: hidden;
             /* Macho DUI için */
             z-index: 9999;
@@ -562,6 +551,10 @@
                 case 'KeyQ':
                 case 'Q':
                 case 'q':
+                case 'A':
+                case 'a':
+                case 'ArrowLeft':
+                case 'Left':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -576,6 +569,10 @@
                 case 'KeyE':
                 case 'E':
                 case 'e':
+                case 'D':
+                case 'd':
+                case 'ArrowRight':
+                case 'Right':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -585,16 +582,6 @@
                     } else {
                         handleSliderInput(true);
                     }
-                    break;
-                    
-                case 'ArrowLeft':
-                case 'Left':
-                    handleSliderInput(false);
-                    break;
-                    
-                case 'ArrowRight':
-                case 'Right':
-                    handleSliderInput(true);
                     break;
             }
             
