@@ -20,10 +20,29 @@
         .menu-container {
             background: rgba(0, 0, 0, 0.95);
             border-radius: 8px;
-            width: 350px;
+            width: 400px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            position: relative;
+        }
+
+        /* Sol taraf progress indicator */
+        .progress-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: rgba(52, 152, 219, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: linear-gradient(180deg, #3498db, #2980b9);
+            transition: height 0.3s ease, top 0.3s ease;
+            border-radius: 0 2px 2px 0;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
         }
 
         .header {
@@ -72,24 +91,83 @@
         .menu-title {
             background: rgba(0, 0, 0, 0.8);
             color: #bdc3c7;
-            padding: 12px 20px;
+            padding: 12px 25px;
             font-size: 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
+        /* Yatay tab sistem */
+        .tab-container {
+            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-container.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+
+        .tab:hover {
+            background: rgba(52, 152, 219, 0.2);
+        }
+
+        .tab.active {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+        }
+
         .menu-items {
             padding: 0;
             list-style: none;
             margin: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3498db transparent;
+        }
+
+        .menu-items::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .menu-items::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .menu-items::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 3px;
         }
 
         .menu-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
+            padding: 15px 25px;
             cursor: pointer;
             transition: all 0.2s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -117,7 +195,7 @@
 
         .footer {
             background: rgba(0, 0, 0, 0.9);
-            padding: 10px 20px;
+            padding: 10px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -159,7 +237,18 @@
             border: 1px solid rgba(52, 152, 219, 0.3);
         }
 
-        /* Animasyon için */
+        .back-button {
+            background: rgba(231, 76, 60, 0.8);
+            margin: 10px 25px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .back-button.show {
+            display: block;
+        }
+
+        /* Animasyonlar */
         @keyframes slideIn {
             from {
                 opacity: 0;
@@ -178,6 +267,11 @@
 </head>
 <body>
     <div class="menu-container">
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-bar" id="progressBar" style="height: 11.11%; top: 0;"></div>
+        </div>
+
         <div class="header">
             <div class="logo">
                 <div class="logo-icon"></div>
@@ -185,244 +279,406 @@
             </div>
         </div>
 
-        <div class="menu-title">Main menu</div>
+        <div class="menu-title" id="menuTitle">Main menu</div>
 
+        <!-- Yatay Tab Container -->
+        <div class="tab-container" id="tabContainer">
+            <div class="tabs" id="tabs">
+                <!-- Dinamik olarak eklenecek -->
+            </div>
+        </div>
+
+        <!-- Ana Menü -->
         <ul class="menu-items" id="menuItems">
-            <li class="menu-item active" data-action="player">
+            <li class="menu-item active" data-action="player" data-index="0">
                 <span>Player</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="server">
+            <li class="menu-item" data-action="server" data-index="1">
                 <span>Server</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="weapon">
+            <li class="menu-item" data-action="weapon" data-index="2">
                 <span>Weapon</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="combat">
+            <li class="menu-item" data-action="combat" data-index="3">
                 <span>Combat</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="vehicle">
+            <li class="menu-item" data-action="vehicle" data-index="4">
                 <span>Vehicle</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="visual">
+            <li class="menu-item" data-action="visual" data-index="5">
                 <span>Visual</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="miscellaneous">
+            <li class="menu-item" data-action="miscellaneous" data-index="6">
                 <span>Miscellaneous</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="settings">
+            <li class="menu-item" data-action="settings" data-index="7">
                 <span>Settings</span>
                 <span class="arrow">»</span>
             </li>
-            <li class="menu-item" data-action="search">
+            <li class="menu-item" data-action="search" data-index="8">
                 <span>Search</span>
                 <span class="arrow">»</span>
             </li>
         </ul>
+
+        <!-- Geri dönüş butonu -->
+        <div class="menu-item back-button" id="backButton">
+            <span>← Back to Main Menu</span>
+            <span class="arrow"></span>
+        </div>
 
         <div class="footer">
             <div class="build-info">
                 <div class="search-icon">🔍</div>
                 <span>Build: 262119</span>
             </div>
-            <div class="page-info">1 / 9</div>
+            <div class="page-info" id="pageInfo">1 / 9</div>
         </div>
     </div>
 
     <div class="controls-hint">
-        ↑↓ Navigate • Enter Select • ESC Close
+        ↑↓ Navigate • ←→ Switch Tab • Enter Select • ESC Close
     </div>
 
     <script>
         let currentIndex = 0;
-        const menuItems = document.querySelectorAll('.menu-item');
-        const totalItems = menuItems.length;
+        let currentTab = 0;
+        let menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
+        let isInSubMenu = false;
+        let currentCategory = '';
 
-        // İlk öğeyi aktif yap
+        // Sub-menu verileri
+        const subMenuData = {
+            player: [
+                'God Mode', 'Infinite Health', 'Fast Run', 'Super Jump', 'Invisibility', 'No Fall Damage'
+            ],
+            server: [
+                'Change Weather', 'Set Time', 'Teleport All', 'Server Info', 'Player List', 'Admin Panel'
+            ],
+            weapon: [
+                'Give All Weapons', 'Infinite Ammo', 'No Recoil', 'Damage Modifier', 'Auto Reload', 'Silent Aim'
+            ],
+            combat: [
+                'Aimbot', 'ESP Players', 'No Spread', 'Auto Aim', 'Wallhack', 'Rage Mode'
+            ],
+            vehicle: [
+                'Spawn Vehicle', 'God Mode Vehicle', 'Super Speed', 'Fly Mode', 'Auto Repair', 'Boost'
+            ],
+            visual: [
+                'Crosshair', 'Player Names', 'Bone ESP', 'Radar', 'Night Vision', 'Thermal Vision'
+            ],
+            miscellaneous: [
+                'Teleport', 'Speed Hack', 'Fly Hack', 'Misc Options', 'Fun Stuff', 'Utilities'
+            ],
+            settings: [
+                'Key Bindings', 'Menu Settings', 'Config', 'Save/Load', 'Theme', 'Reset'
+            ]
+        };
+
+        // Progress bar güncelle
+        function updateProgressBar() {
+            const totalItems = menuItems.length;
+            const progressHeight = (100 / totalItems);
+            const progressTop = (currentIndex / totalItems) * 100;
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.height = progressHeight + '%';
+            progressBar.style.top = progressTop + '%';
+        }
+
+        // Aktif öğeyi ayarla
         function setActiveItem(index) {
             menuItems.forEach(item => item.classList.remove('active'));
-            menuItems[index].classList.add('active');
+            if (menuItems[index]) {
+                menuItems[index].classList.add('active');
+                updateProgressBar();
+            }
+        }
+
+        // Alt menüyü göster
+        function showSubMenu(category) {
+            if (!subMenuData[category]) return;
+            
+            isInSubMenu = true;
+            currentCategory = category;
+            currentTab = 0;
+            
+            // Başlığı güncelle
+            document.getElementById('menuTitle').textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' menu';
+            
+            // Tab container'ı göster
+            const tabContainer = document.getElementById('tabContainer');
+            tabContainer.classList.add('active');
+            
+            // Tabları oluştur
+            const tabsContainer = document.getElementById('tabs');
+            tabsContainer.innerHTML = '';
+            
+            subMenuData[category].forEach((item, index) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (index === 0 ? ' active' : '');
+                tab.textContent = item;
+                tab.onclick = () => selectTab(index);
+                tabsContainer.appendChild(tab);
+            });
+            
+            // Menu items'ı güncelle
+            updateMenuItems();
+            
+            // Geri butonu göster
+            document.getElementById('backButton').classList.add('show');
+            
+            // Sayfa bilgisini güncelle
+            document.getElementById('pageInfo').textContent = `1 / ${subMenuData[category].length}`;
+        }
+
+        // Tab seçimi
+        function selectTab(tabIndex) {
+            currentTab = tabIndex;
+            
+            // Tab görünümünü güncelle
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', index === tabIndex);
+            });
+            
+            // İçeriği güncelle
+            updateMenuItems();
+        }
+
+        // Menu items güncelle
+        function updateMenuItems() {
+            const menuContainer = document.getElementById('menuItems');
+            menuContainer.innerHTML = '';
+            
+            if (isInSubMenu && subMenuData[currentCategory]) {
+                const selectedItem = subMenuData[currentCategory][currentTab];
+                
+                // Seçili kategorinin alt seçeneklerini göster
+                const subOptions = getSubOptions(selectedItem);
+                
+                subOptions.forEach((option, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'menu-item' + (index === 0 ? ' active' : '');
+                    li.setAttribute('data-action', option.action);
+                    li.setAttribute('data-index', index);
+                    li.innerHTML = `
+                        <span>${option.name}</span>
+                        <span class="arrow">»</span>
+                    `;
+                    menuContainer.appendChild(li);
+                });
+                
+                // Menu items'ı güncelle
+                menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
+                currentIndex = 0;
+                setActiveItem(0);
+            }
+        }
+
+        // Alt seçenekleri al
+        function getSubOptions(category) {
+            const options = {
+                'God Mode': [
+                    {name: 'Enable God Mode', action: 'god_mode_on'},
+                    {name: 'Disable God Mode', action: 'god_mode_off'},
+                    {name: 'Toggle God Mode', action: 'god_mode_toggle'}
+                ],
+                'Infinite Health': [
+                    {name: 'Max Health', action: 'max_health'},
+                    {name: 'Max Armor', action: 'max_armor'},
+                    {name: 'Both', action: 'max_both'}
+                ],
+                'Change Weather': [
+                    {name: 'Clear', action: 'weather_clear'},
+                    {name: 'Rain', action: 'weather_rain'},
+                    {name: 'Thunder', action: 'weather_thunder'},
+                    {name: 'Snow', action: 'weather_snow'}
+                ],
+                'Spawn Vehicle': [
+                    {name: 'Adder', action: 'spawn_adder'},
+                    {name: 'Zentorno', action: 'spawn_zentorno'},
+                    {name: 'T20', action: 'spawn_t20'},
+                    {name: 'Custom', action: 'spawn_custom'}
+                ]
+            };
+            
+            return options[category] || [
+                {name: 'Option 1', action: 'option1'},
+                {name: 'Option 2', action: 'option2'},
+                {name: 'Option 3', action: 'option3'}
+            ];
+        }
+
+        // Ana menüye dön
+        function returnToMainMenu() {
+            isInSubMenu = false;
+            currentCategory = '';
+            currentIndex = 0;
+            
+            // Başlığı sıfırla
+            document.getElementById('menuTitle').textContent = 'Main menu';
+            
+            // Tab container'ı gizle
+            document.getElementById('tabContainer').classList.remove('active');
+            
+            // Ana menü items'ını yükle
+            const menuContainer = document.getElementById('menuItems');
+            menuContainer.innerHTML = `
+                <li class="menu-item active" data-action="player" data-index="0">
+                    <span>Player</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="server" data-index="1">
+                    <span>Server</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="weapon" data-index="2">
+                    <span>Weapon</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="combat" data-index="3">
+                    <span>Combat</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="vehicle" data-index="4">
+                    <span>Vehicle</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="visual" data-index="5">
+                    <span>Visual</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="miscellaneous" data-index="6">
+                    <span>Miscellaneous</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="settings" data-index="7">
+                    <span>Settings</span>
+                    <span class="arrow">»</span>
+                </li>
+                <li class="menu-item" data-action="search" data-index="8">
+                    <span>Search</span>
+                    <span class="arrow">»</span>
+                </li>
+            `;
+            
+            // Menu items güncelle
+            menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
+            setActiveItem(0);
+            
+            // Geri butonu gizle
+            document.getElementById('backButton').classList.remove('show');
+            
+            // Sayfa bilgisini güncelle
+            document.getElementById('pageInfo').textContent = '1 / 9';
         }
 
         // Keyboard kontrolleri
         document.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            
             switch(e.key) {
                 case 'ArrowUp':
-                    e.preventDefault();
-                    currentIndex = (currentIndex - 1 + totalItems) % totalItems;
-                    setActiveItem(currentIndex);
+                    if (isInSubMenu) {
+                        currentIndex = Math.max(0, currentIndex - 1);
+                        setActiveItem(currentIndex);
+                    } else {
+                        currentIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+                        setActiveItem(currentIndex);
+                    }
                     break;
                     
                 case 'ArrowDown':
-                    e.preventDefault();
-                    currentIndex = (currentIndex + 1) % totalItems;
-                    setActiveItem(currentIndex);
+                    if (isInSubMenu) {
+                        currentIndex = Math.min(menuItems.length - 1, currentIndex + 1);
+                        setActiveItem(currentIndex);
+                    } else {
+                        currentIndex = (currentIndex + 1) % menuItems.length;
+                        setActiveItem(currentIndex);
+                    }
+                    break;
+                    
+                case 'ArrowLeft':
+                    if (isInSubMenu) {
+                        const totalTabs = document.querySelectorAll('.tab').length;
+                        currentTab = (currentTab - 1 + totalTabs) % totalTabs;
+                        selectTab(currentTab);
+                    }
+                    break;
+                    
+                case 'ArrowRight':
+                    if (isInSubMenu) {
+                        const totalTabs = document.querySelectorAll('.tab').length;
+                        currentTab = (currentTab + 1) % totalTabs;
+                        selectTab(currentTab);
+                    }
                     break;
                     
                 case 'Enter':
-                    e.preventDefault();
                     selectCurrentItem();
                     break;
                     
                 case 'Escape':
-                    e.preventDefault();
-                    closeMenu();
+                    if (isInSubMenu) {
+                        returnToMainMenu();
+                    } else {
+                        closeMenu();
+                    }
                     break;
             }
         });
 
-        // Mouse kontrolü (opsiyonel)
-        menuItems.forEach((item, index) => {
-            item.addEventListener('mouseenter', () => {
-                currentIndex = index;
-                setActiveItem(currentIndex);
-            });
-            
-            item.addEventListener('click', () => {
-                selectCurrentItem();
-            });
-        });
-
         // Mevcut öğeyi seç
         function selectCurrentItem() {
-            const activeItem = menuItems[currentIndex];
-            const action = activeItem.getAttribute('data-action');
-            
-            // Lua'ya mesaj gönder
-            parent.postMessage({
-                type: 'menuAction',
-                action: action,
-                category: action
-            }, '*');
-            
-            console.log('Selected:', action);
-            
-            // Alt menü simülasyonu için
-            if (action !== 'search') {
-                showSubMenu(action);
-            }
-        }
-
-        // Alt menü gösterimi
-        function showSubMenu(category) {
-            const subMenus = {
-                player: ['God Mode', 'Infinite Health', 'Fast Run', 'Super Jump'],
-                server: ['Change Weather', 'Set Time', 'Teleport All', 'Server Info'],
-                weapon: ['Give All Weapons', 'Infinite Ammo', 'No Recoil', 'Damage Modifier'],
-                combat: ['Aimbot', 'ESP', 'No Spread', 'Auto Aim'],
-                vehicle: ['Spawn Vehicle', 'God Mode Vehicle', 'Super Speed', 'Fly Mode'],
-                visual: ['Crosshair', 'Player Names', 'Bone ESP', 'Radar'],
-                miscellaneous: ['Teleport', 'Speed Hack', 'Fly Hack', 'Misc Options'],
-                settings: ['Key Bindings', 'Menu Settings', 'Config', 'Save/Load']
-            };
-
-            const items = subMenus[category] || [];
-            
-            // Alt menü HTML'i oluştur
-            let subMenuHtml = `
-                <div class="menu-title">${category.charAt(0).toUpperCase() + category.slice(1)} menu</div>
-                <ul class="menu-items">
-            `;
-            
-            items.forEach((item, index) => {
-                subMenuHtml += `
-                    <li class="menu-item ${index === 0 ? 'active' : ''}" data-action="${item.toLowerCase().replace(/\s+/g, '_')}">
-                        <span>${item}</span>
-                        <span class="arrow">»</span>
-                    </li>
-                `;
-            });
-            
-            subMenuHtml += `
-                <li class="menu-item" data-action="back">
-                    <span>← Back to Main</span>
-                    <span class="arrow"></span>
-                </li>
-            </ul>`;
-
-            // Menü içeriğini güncelle
-            const menuContainer = document.querySelector('.menu-items').parentElement;
-            menuContainer.innerHTML = subMenuHtml + `
-                <div class="footer">
-                    <div class="build-info">
-                        <div class="search-icon">🔍</div>
-                        <span>Build: 262119</span>
-                    </div>
-                    <div class="page-info">1 / ${items.length + 1}</div>
-                </div>
-            `;
-            
-            // Event listener'ları yeniden ekle
-            setTimeout(setupSubMenu, 100);
-        }
-
-        // Alt menü setup
-        function setupSubMenu() {
-            const subMenuItems = document.querySelectorAll('.menu-item');
-            let subCurrentIndex = 0;
-            
-            // Keyboard kontrolleri
-            document.onkeydown = function(e) {
-                switch(e.key) {
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        subCurrentIndex = (subCurrentIndex - 1 + subMenuItems.length) % subMenuItems.length;
-                        setActiveSubItem(subCurrentIndex);
-                        break;
-                        
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        subCurrentIndex = (subCurrentIndex + 1) % subMenuItems.length;
-                        setActiveSubItem(subCurrentIndex);
-                        break;
-                        
-                    case 'Enter':
-                        e.preventDefault();
-                        selectSubMenuItem(subCurrentIndex);
-                        break;
-                        
-                    case 'Escape':
-                        e.preventDefault();
-                        location.reload(); // Ana menüye dön
-                        break;
-                }
-            };
-            
-            function setActiveSubItem(index) {
-                subMenuItems.forEach(item => item.classList.remove('active'));
-                subMenuItems[index].classList.add('active');
-            }
-            
-            function selectSubMenuItem(index) {
-                const activeItem = subMenuItems[index];
-                const action = activeItem.getAttribute('data-action');
-                
-                if (action === 'back') {
-                    location.reload();
-                } else {
+            if (isInSubMenu) {
+                const activeItem = menuItems[currentIndex];
+                if (activeItem) {
+                    const action = activeItem.getAttribute('data-action');
+                    
                     parent.postMessage({
                         type: 'menuAction',
-                        action: action
+                        action: action,
+                        category: currentCategory
                     }, '*');
+                    
                     console.log('Sub-menu action:', action);
                 }
+            } else {
+                const activeItem = menuItems[currentIndex];
+                const action = activeItem.getAttribute('data-action');
+                
+                if (action === 'search') {
+                    parent.postMessage({
+                        type: 'menuAction',
+                        action: 'search'
+                    }, '*');
+                } else {
+                    showSubMenu(action);
+                }
             }
-            
-            // Mouse eventi
-            subMenuItems.forEach((item, index) => {
+        }
+
+        // Geri butonu
+        document.getElementById('backButton').onclick = returnToMainMenu;
+
+        // Mouse kontrolleri
+        function setupMouseEvents() {
+            menuItems.forEach((item, index) => {
                 item.addEventListener('mouseenter', () => {
-                    subCurrentIndex = index;
-                    setActiveSubItem(subCurrentIndex);
+                    currentIndex = index;
+                    setActiveItem(currentIndex);
                 });
                 
                 item.addEventListener('click', () => {
-                    selectSubMenuItem(subCurrentIndex);
+                    selectCurrentItem();
                 });
             });
         }
@@ -434,25 +690,12 @@
             }, '*');
         }
 
-        // Lua'dan gelen mesajları dinle
-        window.addEventListener('message', function(event) {
-            const data = event.data;
-            
-            switch(data.type) {
-                case 'showNotification':
-                    console.log('Notification:', data.message);
-                    break;
-                case 'hideMenu':
-                    document.body.style.opacity = '0';
-                    break;
-                case 'showMenu':
-                    document.body.style.opacity = '1';
-                    break;
-            }
-        });
+        // Initialize
+        setActiveItem(0);
+        setupMouseEvents();
 
-        console.log('🎮 Phaze Menu loaded and ready!');
-        console.log('🎯 Controls: ↑↓ Navigate, Enter Select, ESC Close');
+        console.log('🎮 Gelişmiş Phaze Menu yüklendi!');
+        console.log('🎯 Kontroller: ↑↓ Navigate, ←→ Tab Switch, Enter Select, ESC Close/Back');
     </script>
 </body>
 </html>
