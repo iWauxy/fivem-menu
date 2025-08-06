@@ -1,270 +1,1236 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Heisenberg Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Menu</title>
     <style>
-        /* Google Fonts - Daha modern bir görünüm için */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
-        :root {
-            --background: rgba(20, 20, 25, 0.95);
-            --header-bg: rgba(30, 30, 35, 0.98);
-            --accent: #007bff;
-            --accent-hover: #0056b3;
-            --text-primary: #f0f0f0;
-            --text-secondary: #a0a0a0;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* En Önemli Kısım: Arka planı şeffaf yap */
-        body {
-            background: transparent;
-            font-family: 'Inter', sans-serif;
-            color: var(--text-primary);
-            overflow: hidden;
-            user-select: none;
-        }
-        
-        #menu-container {
-            position: absolute;
-            left: 50px;
-            top: 50px;
-            width: 280px;
-            background: var(--background);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-            display: none; /* JS ile kontrol edilecek */
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-        }
-
-        #menu-container.visible {
-            display: block;
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .header {
-            padding: 12px;
-            text-align: center;
-            background: var(--header-bg);
-            border-bottom: 1px solid var(--border-color);
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent);
-            border-radius: 7px 7px 0 0;
-        }
-        
-        .menu-title {
-            padding: 8px 12px;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            background: rgba(0,0,0,0.2);
-        }
-
-        .menu-items {
-            list-style: none;
+        * {
             margin: 0;
-            padding: 8px;
-            max-height: 400px;
-            overflow-y: auto;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .menu-item {
-            padding: 10px 15px;
-            border-radius: 5px;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            color: #fff;
+            user-select: none;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-container {
+            width: 420px;
+            height: 600px;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(100, 180, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            transform: scale(0.9) translateY(30px);
+            animation: menuAppear 0.5s ease-out forwards;
+        }
+
+        @keyframes menuAppear {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Header */
+        .menu-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .menu-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(100, 180, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .menu-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            color: #a0c4ff;
+        }
+
+        /* Sub Header (Categories or Tabs) */
+        .menu-subheader {
+            background: rgba(20, 20, 35, 0.8);
+            padding: 0;
+            display: flex;
+            border-bottom: 1px solid rgba(100, 180, 255, 0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 11px;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-button.active {
+            color: #64b4ff;
+            background: rgba(100, 180, 255, 0.1);
+        }
+
+        .tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #64b4ff;
+            transition: width 0.3s ease;
+        }
+
+        .tab-button.active::after {
+            width: 100%;
+        }
+
+        /* Content Area */
+        .menu-content {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .menu-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .menu-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-content::-webkit-scrollbar-thumb {
+            background: rgba(100, 180, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        /* Menu Items */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: rgba(100, 180, 255, 0.1);
+            border-color: rgba(100, 180, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .menu-item.selected {
+            background: rgba(100, 180, 255, 0.15);
+            border-color: rgba(100, 180, 255, 0.5);
+            box-shadow: 0 0 20px rgba(100, 180, 255, 0.2);
+        }
+
+        .item-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .category-item {
+            background: linear-gradient(135deg, rgba(100, 180, 255, 0.1), rgba(50, 120, 200, 0.1));
+        }
+
+        .category-item:hover {
+            background: linear-gradient(135deg, rgba(100, 180, 255, 0.2), rgba(50, 120, 200, 0.2));
+        }
+
+        .category-arrow {
+            color: #64b4ff;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item:hover .category-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Controls */
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.active {
+            background: linear-gradient(135deg, #64b4ff, #4a9eff);
+            box-shadow: 0 0 15px rgba(100, 180, 255, 0.4);
+        }
+
+        .toggle-dot {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle.active .toggle-dot {
+            transform: translateX(24px);
+        }
+
+        /* Custom Slider */
+        .slider-container {
+            width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #64b4ff, #4a9eff);
+            border-radius: 2px;
+            transition: width 0.1s ease;
+        }
+
+        .slider-handle {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: -6px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease;
+        }
+
+        .slider-value {
+            font-size: 11px;
+            color: #64b4ff;
+            min-width: 25px;
+            text-align: right;
+        }
+
+        /* Button Styles */
+        .btn-execute {
+            background: linear-gradient(135deg, #4a9eff, #64b4ff);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-execute:hover {
+            background: linear-gradient(135deg, #64b4ff, #4a9eff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 180, 255, 0.4);
+        }
+
+        /* Clothing Item */
+        .clothing-value {
+            font-size: 12px;
+            color: #64b4ff;
+            background: rgba(100, 180, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(100, 180, 255, 0.2);
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 15px;
+            background: rgba(20, 20, 35, 0.8);
+            border-bottom: 1px solid rgba(100, 180, 255, 0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-input:focus {
+            border-color: #64b4ff;
+            background: rgba(100, 180, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(100, 180, 255, 0.1);
+        }
+
+        /* Footer */
+        .menu-footer {
+            background: rgba(10, 10, 20, 0.9);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 15px;
-        }
-        
-        .menu-item.active {
-            background-color: var(--accent);
-            color: white;
-        }
-        
-        .menu-item .value {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .menu-item.active .value {
-            color: white;
+            border-top: 1px solid rgba(100, 180, 255, 0.1);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .footer {
-            padding: 8px 15px;
-            text-align: right;
-            font-size: 12px;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border-color);
+        .build-info {
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Player List Item */
+        .player-item {
+            background: rgba(100, 180, 255, 0.05);
+            border-left: 3px solid #64b4ff;
+        }
+
+        .player-item:hover {
+            background: rgba(100, 180, 255, 0.1);
+        }
+
+        .player-id {
+            font-size: 11px;
+            color: #64b4ff;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        /* Hide scrollbar for category view */
+        .category-view .menu-content::-webkit-scrollbar {
+            width: 0;
         }
     </style>
 </head>
 <body>
-    <div id="menu-container">
-        <div class="header">Heisenberg</div>
-        <div class="menu-title" id="menu-title"></div>
-        <ul class="menu-items" id="menu-items"></ul>
-        <div class="footer">
-            <span id="item-counter"></span>
+    <div class="menu-container">
+        <!-- Header -->
+        <div class="menu-header">
+            <div class="menu-title">NEBULA</div>
+            <div class="menu-subtitle">Advanced Menu System</div>
+        </div>
+
+        <!-- Search (only visible in search mode) -->
+        <div class="search-container" id="searchContainer" style="display: none;">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search features...">
+        </div>
+
+        <!-- Sub Header (Tabs) -->
+        <div class="menu-subheader" id="subHeader">
+            <!-- Tabs will be generated dynamically -->
+        </div>
+
+        <!-- Content -->
+        <div class="menu-content" id="menuContent">
+            <!-- Content will be generated dynamically -->
+        </div>
+
+        <!-- Footer -->
+        <div class="menu-footer">
+            <div class="build-info">Build: 262119</div>
+            <div class="item-counter" id="itemCounter">0 / 0</div>
         </div>
     </div>
 
     <script>
-        // --- NUI İLETİŞİMİ ---
-        // Lua'ya mesaj göndermek için bu fonksiyonu kullanacağız
-        const sendAction = (action, params = {}) => {
-            fetch(`https://macho/executeAction`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-                body: JSON.stringify({ action, params })
-            }).catch(err => console.error("Action Failed:", err));
-        };
-        
-        // --- MENÜ VERİLERİ (Basit ve Anlaşılır) ---
-        // Menünün tüm yapısı burada, statik olarak tanımlanmıştır.
-        const menuData = {
-            main: {
-                title: 'Ana Menü',
-                items: [
-                    { name: 'Player', subMenu: 'player' },
-                    { name: 'Vehicle', subMenu: 'vehicle' },
-                    { name: 'Tools', subMenu: 'tools' },
-                    // Buraya yeni ana kategoriler ekleyebilirsin
-                ]
-            },
-            player: {
-                title: 'Player Seçenekleri',
-                items: [
-                    { name: 'God Mode', action: 'player_godmode' },
-                    { name: 'Heal', action: 'player_heal' },
-                    { name: 'Invisible', action: 'player_invisible' },
-                    { name: 'No Ragdoll', action: 'player_noragdoll' },
-                    { name: 'Noclip', action: 'player_noclip' },
-                ]
-            },
-            vehicle: {
-                title: 'Araç Seçenekleri',
-                items: [
-                    { name: 'Spawn T20', action: 'vehicle_spawn', params: { model: 't20' } },
-                    { name: 'Spawn Zentorno', action: 'vehicle_spawn', params: { model: 'zentorno' } },
-                    { name: 'Repair Vehicle', action: 'vehicle_repair' },
-                    { name: 'Vehicle God Mode', action: 'vehicle_godmode' },
-                ]
-            },
-            tools: {
-                title: 'Araçlar',
-                items: [
-                    { name: 'Advanced Freecam', action: 'tools_freecam' },
-                ]
-            },
-        };
+        class NebulaMenu {
+            constructor() {
+                this.currentView = 'main';
+                this.currentCategory = null;
+                this.currentSubCategory = 0;
+                this.selectedIndex = 0;
+                this.searchQuery = '';
+                this.searchResults = [];
+                this.onlinePlayers = [];
+                
+                this.initializeMenu();
+                this.bindEvents();
+                this.loadMainCategories();
+            }
 
-        // --- MENÜ KONTROL MANTIĞI ---
-        let currentMenu = 'main';
-        let selectedIndex = 0;
-        const menuHistory = []; // Geri gitmek için
+            // Menu Configuration
+            categories = [
+                { name: "Player", icon: "👤" },
+                { name: "Online", icon: "🌐" },
+                { name: "Weapon", icon: "🔫" },
+                { name: "Combat", icon: "⚔️" },
+                { name: "Vehicle", icon: "🚗" },
+                { name: "Visual", icon: "👁️" },
+                { name: "Settings", icon: "⚙️" },
+                { name: "Search", icon: "🔍" }
+            ];
 
-        function renderMenu() {
-            const container = document.getElementById('menu-items');
-            const title = document.getElementById('menu-title');
-            const counter = document.getElementById('item-counter');
-            
-            container.innerHTML = ''; // Listeyi temizle
-            
-            const menu = menuData[currentMenu];
-            if (!menu) return;
-
-            title.textContent = menu.title;
-
-            menu.items.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'menu-item';
-                if (index === selectedIndex) {
-                    li.classList.add('active');
+            categoryConfigs = {
+                Player: {
+                    subCategories: ["Player", "Miscellaneous", "Wardrobe"],
+                    items: {
+                        Player: [
+                            {name: "Desync", type: "toggle", value: false},
+                            {name: "Clear screen effects", type: "toggle", value: false},
+                            {name: "Clear tasks", type: "toggle", value: false},
+                            {name: "Refresh interior", type: "button"},
+                            {name: "Speed multiplier", type: "slider", value: 1.0, min: 0.5, max: 3.0},
+                            {name: "Jump height", type: "slider", value: 1.0, min: 1.0, max: 5.0}
+                        ],
+                        Miscellaneous: [
+                            {name: "Simplify drug selling", type: "toggle", value: false},
+                            {name: "Fail", type: "toggle", value: true},
+                            {name: "No ragdoll", type: "toggle", value: true},
+                            {name: "No collision", type: "toggle", value: true},
+                            {name: "Solo session", type: "toggle", value: true},
+                            {name: "Friendly fire", type: "toggle", value: true},
+                            {name: "Burning mode", type: "toggle", value: false},
+                            {name: "Force third person camera", type: "toggle", value: false},
+                            {name: "Psychgun", type: "toggle", value: false}
+                        ],
+                        Wardrobe: [
+                            {name: "Auto Outfit Changer", type: "toggle", value: false},
+                            {name: "Random Outfit", type: "button"},
+                            {name: "Hair", type: "clothing", componentId: 2, value: 0, max: 10},
+                            {name: "Hat", type: "clothing", propId: 0, value: 0, max: 5},
+                            {name: "Mask", type: "clothing", componentId: 1, value: 0, max: 15},
+                            {name: "Glasses", type: "clothing", propId: 1, value: 0, max: 8},
+                            {name: "Tops", type: "clothing", componentId: 11, value: 0, max: 20},
+                            {name: "Legs", type: "clothing", componentId: 4, value: 0, max: 25},
+                            {name: "Shoes", type: "clothing", componentId: 6, value: 0, max: 18}
+                        ]
+                    }
+                },
+                Online: {
+                    subCategories: ["List", "Safe", "Risky", "Vehicle", "Triggers"],
+                    items: {
+                        List: [
+                            {name: "Select All", type: "button"},
+                            {name: "Unselect All", type: "button"}
+                        ],
+                        Safe: [
+                            {name: "Spectate", type: "toggle", value: false},
+                            {name: "View Profile", type: "button"},
+                            {name: "Copy Name", type: "button"}
+                        ],
+                        Risky: [
+                            {name: "Track Player", type: "button"},
+                            {name: "Teleport to Player", type: "button"},
+                            {name: "Bring Player", type: "button"}
+                        ],
+                        Vehicle: [
+                            {name: "Clone Vehicle", type: "button"},
+                            {name: "Steal Vehicle", type: "button"}
+                        ],
+                        Triggers: [
+                            {name: "Custom Event", type: "button"},
+                            {name: "Crash Player", type: "button"}
+                        ]
+                    }
+                },
+                Weapon: {
+                    subCategories: ["Damage", "Accuracy", "Ammo"],
+                    items: {
+                        Damage: [
+                            {name: "Damage multiplier", type: "slider", value: 1.0, min: 1.0, max: 10.0},
+                            {name: "One shot kill", type: "toggle", value: false}
+                        ],
+                        Accuracy: [
+                            {name: "Perfect accuracy", type: "toggle", value: false},
+                            {name: "No recoil", type: "toggle", value: false},
+                            {name: "No spread", type: "toggle", value: false}
+                        ],
+                        Ammo: [
+                            {name: "Infinite ammo", type: "toggle", value: false},
+                            {name: "Fast reload", type: "toggle", value: false}
+                        ]
+                    }
+                },
+                Combat: {
+                    subCategories: ["Attack", "Defense", "Special"],
+                    items: {
+                        Attack: [
+                            {name: "Auto aim", type: "toggle", value: false},
+                            {name: "Trigger bot", type: "toggle", value: false},
+                            {name: "Melee boost", type: "toggle", value: false}
+                        ],
+                        Defense: [
+                            {name: "God mode", type: "toggle", value: false},
+                            {name: "Anti headshot", type: "toggle", value: false}
+                        ],
+                        Special: [
+                            {name: "Explosive bullets", type: "toggle", value: false},
+                            {name: "Fire bullets", type: "toggle", value: false}
+                        ]
+                    }
+                },
+                Vehicle: {
+                    subCategories: ["Performance", "Physics", "Visual"],
+                    items: {
+                        Performance: [
+                            {name: "Speed boost", type: "slider", value: 1.0, min: 1.0, max: 5.0},
+                            {name: "Acceleration boost", type: "toggle", value: false},
+                            {name: "Unlimited fuel", type: "toggle", value: false}
+                        ],
+                        Physics: [
+                            {name: "No collision", type: "toggle", value: false},
+                            {name: "Anti flip", type: "toggle", value: false},
+                            {name: "Vehicle fly", type: "toggle", value: false}
+                        ],
+                        Visual: [
+                            {name: "Rainbow paint", type: "toggle", value: false},
+                            {name: "Neon lights", type: "toggle", value: false}
+                        ]
+                    }
+                },
+                Visual: {
+                    subCategories: ["ESP", "UI", "Effects"],
+                    items: {
+                        ESP: [
+                            {name: "Player ESP", type: "toggle", value: false},
+                            {name: "Vehicle ESP", type: "toggle", value: false},
+                            {name: "Distance ESP", type: "toggle", value: false}
+                        ],
+                        UI: [
+                            {name: "Crosshair", type: "toggle", value: false},
+                            {name: "HUD toggle", type: "toggle", value: true}
+                        ],
+                        Effects: [
+                            {name: "Night vision", type: "toggle", value: false},
+                            {name: "Thermal vision", type: "toggle", value: false}
+                        ]
+                    }
+                },
+                Settings: {
+                    subCategories: ["General", "Keybinds", "Theme"],
+                    items: {
+                        General: [
+                            {name: "Auto save", type: "toggle", value: true},
+                            {name: "Notifications", type: "toggle", value: true}
+                        ],
+                        Keybinds: [
+                            {name: "Menu key", type: "button"},
+                            {name: "Panic key", type: "button"}
+                        ],
+                        Theme: [
+                            {name: "Menu opacity", type: "slider", value: 0.8, min: 0.3, max: 1.0},
+                            {name: "Animation speed", type: "slider", value: 0.15, min: 0.05, max: 0.5}
+                        ]
+                    }
                 }
-                li.textContent = item.name;
-                container.appendChild(li);
-            });
-            
-            counter.textContent = `${selectedIndex + 1} / ${menu.items.length}`;
-        }
-        
-        function navigate(direction) {
-            const menu = menuData[currentMenu];
-            const itemCount = menu.items.length;
-            
-            if (direction === 'up') {
-                selectedIndex = (selectedIndex - 1 + itemCount) % itemCount;
-            } else if (direction === 'down') {
-                selectedIndex = (selectedIndex + 1) % itemCount;
+            };
+
+            initializeMenu() {
+                this.updateItemCounter();
             }
-            renderMenu();
+
+            bindEvents() {
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+                
+                // Search input
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+                }
+
+                // Window message listener for Lua communication
+                window.addEventListener('message', (event) => {
+                    this.handleLuaMessage(event.data);
+                });
+            }
+
+            loadMainCategories() {
+                this.currentView = 'main';
+                const subHeader = document.getElementById('subHeader');
+                const content = document.getElementById('menuContent');
+                
+                subHeader.innerHTML = '<div style="padding: 12px 20px; color: #64b4ff; font-weight: 600;">Main Menu</div>';
+                
+                content.innerHTML = this.categories.map((cat, index) => `
+                    <div class="menu-item category-item ${index === this.selectedIndex ? 'selected' : ''}" data-index="${index}" onclick="menu.selectCategory('${cat.name}')">
+                        <div class="item-label">${cat.icon} ${cat.name}</div>
+                        <div class="category-arrow">›</div>
+                    </div>
+                `).join('');
+
+                this.updateItemCounter();
+            }
+
+            selectCategory(categoryName) {
+                if (categoryName === 'Search') {
+                    this.loadSearchView();
+                    return;
+                }
+
+                this.currentCategory = categoryName;
+                this.currentView = 'category';
+                this.currentSubCategory = 0;
+                this.selectedIndex = 0;
+                this.loadCategoryView();
+            }
+
+            loadCategoryView() {
+                const config = this.categoryConfigs[this.currentCategory];
+                if (!config) return;
+
+                const subHeader = document.getElementById('subHeader');
+                const content = document.getElementById('menuContent');
+
+                // Load sub-category tabs
+                subHeader.innerHTML = config.subCategories.map((subCat, index) => `
+                    <button class="tab-button ${index === this.currentSubCategory ? 'active' : ''}" onclick="menu.selectSubCategory(${index})">
+                        ${subCat}
+                    </button>
+                `).join('');
+
+                this.loadSubCategoryItems();
+            }
+
+            loadSubCategoryItems() {
+                const config = this.categoryConfigs[this.currentCategory];
+                if (!config) return;
+
+                const subCategoryName = config.subCategories[this.currentSubCategory];
+                let items = config.items[subCategoryName] || [];
+                
+                // Add online players to the list if we're in Online > List
+                if (this.currentCategory === 'Online' && subCategoryName === 'List') {
+                    items = [...items, ...this.onlinePlayers.map(player => ({
+                        name: `[${player.id}] ${player.name}`,
+                        type: "toggle",
+                        value: player.targeted || false,
+                        playerData: player
+                    }))];
+                }
+
+                const content = document.getElementById('menuContent');
+                
+                if (items.length === 0) {
+                    content.innerHTML = `
+                        <div class="no-results">
+                            <div class="no-results-icon">📭</div>
+                            <div>No items in this category</div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = items.map((item, index) => 
+                        this.renderMenuItem(item, index)
+                    ).join('');
+                }
+
+                this.updateItemCounter();
+            }
+
+            selectSubCategory(index) {
+                this.currentSubCategory = index;
+                this.selectedIndex = 0;
+                
+                // Update active tab
+                document.querySelectorAll('.tab-button').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === index);
+                });
+
+                this.loadSubCategoryItems();
+            }
+
+            renderMenuItem(item, index) {
+                const isSelected = index === this.selectedIndex ? 'selected' : '';
+                const isPlayerItem = item.playerData ? 'player-item' : '';
+                
+                let controlHtml = '';
+                
+                switch (item.type) {
+                    case 'toggle':
+                        controlHtml = `
+                            <div class="toggle ${item.value ? 'active' : ''}" onclick="menu.toggleItem(${index})">
+                                <div class="toggle-dot"></div>
+                            </div>
+                        `;
+                        break;
+                    case 'slider':
+                        const percentage = ((item.value - item.min) / (item.max - item.min)) * 100;
+                        controlHtml = `
+                            <div class="slider-container">
+                                <div class="slider" onclick="menu.handleSliderClick(event, ${index})">
+                                    <div class="slider-fill" style="width: ${percentage}%"></div>
+                                    <div class="slider-handle" style="left: ${percentage}%"></div>
+                                </div>
+                                <div class="slider-value">${item.value.toFixed(1)}</div>
+                            </div>
+                        `;
+                        break;
+                    case 'button':
+                        controlHtml = `<button class="btn-execute" onclick="menu.executeButton(${index})">EXEC</button>`;
+                        break;
+                    case 'clothing':
+                        controlHtml = `<div class="clothing-value">[${item.value}/${item.max}]</div>`;
+                        break;
+                }
+
+                const label = item.playerData ? 
+                    `<div><span class="player-id">[${item.playerData.id}]</span> ${item.playerData.name}</div>` :
+                    item.name;
+
+                return `
+                    <div class="menu-item ${isSelected} ${isPlayerItem}" data-index="${index}">
+                        <div class="item-label">${label}</div>
+                        ${controlHtml}
+                    </div>
+                `;
+            }
+
+            loadSearchView() {
+                this.currentView = 'search';
+                this.selectedIndex = 0;
+                
+                const searchContainer = document.getElementById('searchContainer');
+                const subHeader = document.getElementById('subHeader');
+                
+                searchContainer.style.display = 'block';
+                subHeader.innerHTML = '<div style="padding: 12px 20px; color: #64b4ff; font-weight: 600;">Search Results</div>';
+                
+                this.updateSearchResults();
+                
+                // Focus search input
+                setTimeout(() => {
+                    document.getElementById('searchInput').focus();
+                }, 100);
+            }
+
+            handleSearch(query) {
+                this.searchQuery = query.toLowerCase();
+                this.updateSearchResults();
+            }
+
+            updateSearchResults() {
+                this.searchResults = [];
+                
+                if (this.searchQuery.trim() === '') {
+                    this.renderSearchResults();
+                    return;
+                }
+
+                // Search through all categories and items
+                Object.keys(this.categoryConfigs).forEach(categoryName => {
+                    const config = this.categoryConfigs[categoryName];
+                    Object.keys(config.items).forEach(subCategoryName => {
+                        config.items[subCategoryName].forEach(item => {
+                            if (item.name.toLowerCase().includes(this.searchQuery)) {
+                                this.searchResults.push({
+                                    item: item,
+                                    category: categoryName,
+                                    subCategory: subCategoryName
+                                });
+                            }
+                        });
+                    });
+                });
+
+                this.renderSearchResults();
+            }
+
+            renderSearchResults() {
+                const content = document.getElementById('menuContent');
+                
+                if (this.searchResults.length === 0) {
+                    content.innerHTML = `
+                        <div class="no-results">
+                            <div class="no-results-icon">🔍</div>
+                            <div>No results found for "${this.searchQuery}"</div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = this.searchResults.map((result, index) => `
+                        <div class="menu-item ${index === this.selectedIndex ? 'selected' : ''}" data-index="${index}" onclick="menu.selectSearchResult(${index})">
+                            <div class="item-label">
+                                <div>${result.item.name}</div>
+                                <div style="font-size: 11px; color: #888; margin-top: 2px;">
+                                    ${result.category} > ${result.subCategory}
+                                </div>
+                            </div>
+                            <div class="category-arrow">›</div>
+                        </div>
+                    `).join('');
+                }
+
+                this.updateItemCounter();
+            }
+
+            selectSearchResult(index) {
+                const result = this.searchResults[index];
+                if (!result) return;
+
+                // Navigate to the item's location
+                this.currentCategory = result.category;
+                this.currentView = 'category';
+                
+                const config = this.categoryConfigs[result.category];
+                this.currentSubCategory = config.subCategories.indexOf(result.subCategory);
+                
+                // Hide search
+                document.getElementById('searchContainer').style.display = 'none';
+                
+                this.loadCategoryView();
+                
+                // Find and select the item
+                setTimeout(() => {
+                    const items = config.items[result.subCategory] || [];
+                    const itemIndex = items.findIndex(item => item.name === result.item.name);
+                    if (itemIndex !== -1) {
+                        this.selectedIndex = itemIndex;
+                        this.updateSelection();
+                    }
+                }, 100);
+            }
+
+            // Control handlers
+            toggleItem(index) {
+                const items = this.getCurrentItems();
+                if (items[index] && items[index].type === 'toggle') {
+                    items[index].value = !items[index].value;
+                    
+                    // Send to Lua
+                    this.sendToLua({
+                        type: 'toggle',
+                        category: this.currentCategory,
+                        subCategory: this.getCurrentSubCategory(),
+                        item: items[index].name,
+                        value: items[index].value,
+                        playerData: items[index].playerData
+                    });
+                    
+                    // Update UI
+                    this.loadSubCategoryItems();
+                }
+            }
+
+            handleSliderClick(event, index) {
+                const items = this.getCurrentItems();
+                const item = items[index];
+                if (!item || item.type !== 'slider') return;
+
+                const slider = event.currentTarget;
+                const rect = slider.getBoundingClientRect();
+                const percentage = (event.clientX - rect.left) / rect.width;
+                const newValue = item.min + (percentage * (item.max - item.min));
+                
+                item.value = Math.max(item.min, Math.min(item.max, newValue));
+                
+                // Send to Lua
+                this.sendToLua({
+                    type: 'slider',
+                    category: this.currentCategory,
+                    subCategory: this.getCurrentSubCategory(),
+                    item: item.name,
+                    value: item.value
+                });
+                
+                // Update UI
+                this.loadSubCategoryItems();
+            }
+
+            executeButton(index) {
+                const items = this.getCurrentItems();
+                const item = items[index];
+                if (!item || item.type !== 'button') return;
+
+                // Send to Lua
+                this.sendToLua({
+                    type: 'button',
+                    category: this.currentCategory,
+                    subCategory: this.getCurrentSubCategory(),
+                    item: item.name
+                });
+
+                // Visual feedback
+                const button = document.querySelector(`[data-index="${index}"] .btn-execute`);
+                if (button) {
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = '';
+                    }, 150);
+                }
+            }
+
+            // Navigation helpers
+            getCurrentItems() {
+                if (this.currentView === 'main') {
+                    return this.categories;
+                } else if (this.currentView === 'search') {
+                    return this.searchResults;
+                } else if (this.currentView === 'category') {
+                    const config = this.categoryConfigs[this.currentCategory];
+                    const subCategoryName = config.subCategories[this.currentSubCategory];
+                    let items = config.items[subCategoryName] || [];
+                    
+                    // Add online players if in Online > List
+                    if (this.currentCategory === 'Online' && subCategoryName === 'List') {
+                        items = [...items, ...this.onlinePlayers.map(player => ({
+                            name: `[${player.id}] ${player.name}`,
+                            type: "toggle",
+                            value: player.targeted || false,
+                            playerData: player
+                        }))];
+                    }
+                    
+                    return items;
+                }
+                return [];
+            }
+
+            getCurrentSubCategory() {
+                if (this.currentCategory && this.categoryConfigs[this.currentCategory]) {
+                    return this.categoryConfigs[this.currentCategory].subCategories[this.currentSubCategory];
+                }
+                return '';
+            }
+
+            // Keyboard navigation
+            handleKeyPress(event) {
+                switch(event.key) {
+                    case 'ArrowUp':
+                        event.preventDefault();
+                        this.navigateUp();
+                        break;
+                    case 'ArrowDown':
+                        event.preventDefault();
+                        this.navigateDown();
+                        break;
+                    case 'ArrowLeft':
+                        event.preventDefault();
+                        this.navigateLeft();
+                        break;
+                    case 'ArrowRight':
+                        event.preventDefault();
+                        this.navigateRight();
+                        break;
+                    case 'Enter':
+                        event.preventDefault();
+                        this.handleEnter();
+                        break;
+                    case 'Escape':
+                    case 'Backspace':
+                        event.preventDefault();
+                        this.handleBack();
+                        break;
+                    case 'q':
+                    case 'Q':
+                        if (this.currentView === 'category') {
+                            event.preventDefault();
+                            this.navigateSubCategoryLeft();
+                        }
+                        break;
+                    case 'e':
+                    case 'E':
+                        if (this.currentView === 'category') {
+                            event.preventDefault();
+                            this.navigateSubCategoryRight();
+                        }
+                        break;
+                }
+            }
+
+            navigateUp() {
+                const items = this.getCurrentItems();
+                if (items.length === 0) return;
+                
+                this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : items.length - 1;
+                this.updateSelection();
+            }
+
+            navigateDown() {
+                const items = this.getCurrentItems();
+                if (items.length === 0) return;
+                
+                this.selectedIndex = this.selectedIndex < items.length - 1 ? this.selectedIndex + 1 : 0;
+                this.updateSelection();
+            }
+
+            navigateLeft() {
+                if (this.currentView !== 'category') return;
+                
+                const items = this.getCurrentItems();
+                const item = items[this.selectedIndex];
+                
+                if (item && item.type === 'slider') {
+                    const step = (item.max - item.min) / 20;
+                    item.value = Math.max(item.min, item.value - step);
+                    this.sendToLua({
+                        type: 'slider',
+                        category: this.currentCategory,
+                        subCategory: this.getCurrentSubCategory(),
+                        item: item.name,
+                        value: item.value
+                    });
+                    this.loadSubCategoryItems();
+                } else if (item && item.type === 'clothing') {
+                    item.value = item.value > 0 ? item.value - 1 : item.max - 1;
+                    this.loadSubCategoryItems();
+                }
+            }
+
+            navigateRight() {
+                if (this.currentView !== 'category') return;
+                
+                const items = this.getCurrentItems();
+                const item = items[this.selectedIndex];
+                
+                if (item && item.type === 'slider') {
+                    const step = (item.max - item.min) / 20;
+                    item.value = Math.min(item.max, item.value + step);
+                    this.sendToLua({
+                        type: 'slider',
+                        category: this.currentCategory,
+                        subCategory: this.getCurrentSubCategory(),
+                        item: item.name,
+                        value: item.value
+                    });
+                    this.loadSubCategoryItems();
+                } else if (item && item.type === 'clothing') {
+                    item.value = item.value < item.max - 1 ? item.value + 1 : 0;
+                    this.loadSubCategoryItems();
+                }
+            }
+
+            navigateSubCategoryLeft() {
+                const config = this.categoryConfigs[this.currentCategory];
+                if (!config) return;
+                
+                this.currentSubCategory = this.currentSubCategory > 0 ? 
+                    this.currentSubCategory - 1 : 
+                    config.subCategories.length - 1;
+                
+                this.selectedIndex = 0;
+                this.selectSubCategory(this.currentSubCategory);
+            }
+
+            navigateSubCategoryRight() {
+                const config = this.categoryConfigs[this.currentCategory];
+                if (!config) return;
+                
+                this.currentSubCategory = this.currentSubCategory < config.subCategories.length - 1 ? 
+                    this.currentSubCategory + 1 : 0;
+                
+                this.selectedIndex = 0;
+                this.selectSubCategory(this.currentSubCategory);
+            }
+
+            handleEnter() {
+                const items = this.getCurrentItems();
+                const item = items[this.selectedIndex];
+                
+                if (this.currentView === 'main') {
+                    this.selectCategory(item.name);
+                } else if (this.currentView === 'search') {
+                    this.selectSearchResult(this.selectedIndex);
+                } else if (this.currentView === 'category') {
+                    if (item.type === 'toggle') {
+                        this.toggleItem(this.selectedIndex);
+                    } else if (item.type === 'button') {
+                        this.executeButton(this.selectedIndex);
+                    } else if (item.type === 'clothing') {
+                        this.sendToLua({
+                            type: 'clothing',
+                            category: this.currentCategory,
+                            subCategory: this.getCurrentSubCategory(),
+                            item: item.name,
+                            value: item.value,
+                            componentId: item.componentId,
+                            propId: item.propId
+                        });
+                    }
+                }
+            }
+
+            handleBack() {
+                if (this.currentView === 'search') {
+                    document.getElementById('searchContainer').style.display = 'none';
+                    this.loadMainCategories();
+                } else if (this.currentView === 'category') {
+                    this.loadMainCategories();
+                }
+            }
+
+            updateSelection() {
+                // Update visual selection
+                document.querySelectorAll('.menu-item').forEach((item, index) => {
+                    item.classList.toggle('selected', index === this.selectedIndex);
+                });
+                
+                this.updateItemCounter();
+            }
+
+            updateItemCounter() {
+                const items = this.getCurrentItems();
+                const counter = document.getElementById('itemCounter');
+                counter.textContent = `${this.selectedIndex + 1} / ${items.length}`;
+            }
+
+            // Lua Communication
+            sendToLua(data) {
+                // Method 1: PostMessage to parent (for NUI compatibility)
+                if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage(data, '*');
+                }
+                
+                // Method 2: Fetch method (for some executors)
+                fetch(`https://nebula_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).catch(() => {
+                    // Fallback: Try command method
+                    this.sendCommand(`nebula_message ${JSON.stringify(data)}`);
+                });
+                
+                console.log('Sent to Lua:', data);
+            }
+
+            sendCommand(command) {
+                // Some executors support direct command execution
+                if (window.invokeNative) {
+                    window.invokeNative('EXECUTE_COMMAND', command);
+                }
+            }
+
+            handleLuaMessage(data) {
+                switch(data.type) {
+                    case 'updatePlayers':
+                        this.onlinePlayers = data.players || [];
+                        if (this.currentCategory === 'Online') {
+                            this.loadSubCategoryItems();
+                        }
+                        break;
+                    case 'updateClothing':
+                        if (data.clothingData && this.currentCategory === 'Player') {
+                            const subCat = this.categoryConfigs.Player.items.Wardrobe;
+                            subCat.forEach(item => {
+                                if (item.type === 'clothing' && data.clothingData[item.name]) {
+                                    item.value = data.clothingData[item.name].value;
+                                    item.max = data.clothingData[item.name].max;
+                                }
+                            });
+                            if (this.getCurrentSubCategory() === 'Wardrobe') {
+                                this.loadSubCategoryItems();
+                            }
+                        }
+                        break;
+                    case 'closeMenu':
+                        this.sendToLua({ type: 'close' });
+                        break;
+                }
+            }
+
+            // Public methods for external calls
+            closeMenu() {
+                this.sendToLua({ type: 'close' });
+            }
         }
 
-        function selectItem() {
-            const item = menuData[currentMenu].items[selectedIndex];
-            if (!item) return;
-
-            if (item.subMenu) {
-                menuHistory.push(currentMenu);
-                currentMenu = item.subMenu;
-                selectedIndex = 0;
-            } else if (item.action) {
-                sendAction(item.action, item.params);
-            }
-            renderMenu();
-        }
-
-        function goBack() {
-            if (menuHistory.length > 0) {
-                currentMenu = menuHistory.pop();
-                selectedIndex = 0;
-                renderMenu();
-            } else {
-                // Ana menüde geri tuşuna basılırsa menüyü kapat
-                sendAction('closeMenu');
-            }
-        }
-        
-        // --- EVENT LISTENERS ---
-        window.addEventListener('message', (event) => {
-            const { type } = event.data;
-            const container = document.getElementById('menu-container');
-
-            if (type === 'show') {
-                container.classList.add('visible');
-                currentMenu = 'main';
-                selectedIndex = 0;
-                menuHistory.length = 0;
-                renderMenu();
-            } else if (type === 'hide') {
-                container.classList.remove('visible');
-            }
+        // Initialize menu when page loads
+        let menu;
+        window.addEventListener('load', () => {
+            menu = new NebulaMenu();
+            console.log('✅ Nebula Menu initialized');
         });
 
-        document.addEventListener('keydown', (e) => {
-            const container = document.getElementById('menu-container');
-            if (!container.classList.contains('visible')) return;
-
-            e.preventDefault();
-
-            switch (e.key) {
-                case 'ArrowUp': navigate('up'); break;
-                case 'ArrowDown': navigate('down'); break;
-                case 'Enter': selectItem(); break;
-                case 'Backspace': goBack(); break;
-                case 'Escape': sendAction('closeMenu'); break;
-            }
-        });
+        // Expose menu to global scope for onclick handlers
+        window.menu = menu;
     </script>
 </body>
 </html>
