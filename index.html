@@ -2,96 +2,457 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>FiveM Menu</title>
+    <title>Phaze Menu</title>
     <style>
         body {
             margin: 0;
-            background: transparent;
-            font-family: Arial;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
-        
-        .menu {
-            background: rgba(0,0,0,0.85);
-            border-radius: 10px;
+
+        .menu-container {
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             padding: 20px;
-            min-width: 300px;
-            border: 2px solid #00ff88;
-        }
-        
-        .title {
-            color: #00ff88;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-shadow: 0 0 10px #00ff88;
+            border-bottom: 2px solid #3498db;
         }
-        
-        .btn {
-            background: linear-gradient(45deg, #333, #555);
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #3498db;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 15px solid #5dade2;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: bold;
             color: white;
-            border: 1px solid #00ff88;
-            border-radius: 5px;
+            text-shadow: 0 2px 10px rgba(52, 152, 219, 0.5);
+        }
+
+        .menu-title {
+            background: rgba(0, 0, 0, 0.8);
+            color: #bdc3c7;
             padding: 12px 20px;
-            margin: 5px 0;
-            width: 100%;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-items {
+            padding: 0;
+            list-style: none;
+            margin: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
             cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 16px;
-            transition: all 0.3s;
         }
-        
-        .btn:hover {
-            background: linear-gradient(45deg, #00ff88, #00cc66);
-            transform: scale(1.02);
-            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
+
+        .menu-item:hover {
+            background: rgba(52, 152, 219, 0.1);
         }
-        
-        .close {
-            background: linear-gradient(45deg, #ff4444, #cc0000);
-            margin-top: 15px;
+
+        .menu-item.active {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+            font-weight: 500;
+        }
+
+        .menu-item .arrow {
+            color: #bdc3c7;
+            font-size: 18px;
+        }
+
+        .menu-item.active .arrow {
+            color: white;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .build-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-icon {
+            background: #34495e;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .page-info {
+            font-weight: bold;
+        }
+
+        .controls-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #bdc3c7;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        /* Animasyon için */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-container {
+            animation: slideIn 0.3s ease-out;
         }
     </style>
 </head>
 <body>
-    <div class="menu">
-        <div class="title">🎮 MENÜ</div>
-        
-        <button class="btn" onclick="action('heal')">💊 Can Yenile</button>
-        <button class="btn" onclick="action('weapon')">🔫 Silah Ver</button>
-        <button class="btn" onclick="action('car')">🚗 Araç Spawn</button>
-        <button class="btn" onclick="action('tp_airport')">✈️ Havaalanına TP</button>
-        <button class="btn" onclick="action('noclip')">👻 NoClip</button>
-        <button class="btn" onclick="action('godmode')">🛡️ God Mode</button>
-        
-        <button class="btn close" onclick="closeMenu()">❌ Kapat</button>
+    <div class="menu-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">Phaze</div>
+            </div>
+        </div>
+
+        <div class="menu-title">Main menu</div>
+
+        <ul class="menu-items" id="menuItems">
+            <li class="menu-item active" data-action="player">
+                <span>Player</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="server">
+                <span>Server</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="weapon">
+                <span>Weapon</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="combat">
+                <span>Combat</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="vehicle">
+                <span>Vehicle</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="visual">
+                <span>Visual</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="miscellaneous">
+                <span>Miscellaneous</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="settings">
+                <span>Settings</span>
+                <span class="arrow">»</span>
+            </li>
+            <li class="menu-item" data-action="search">
+                <span>Search</span>
+                <span class="arrow">»</span>
+            </li>
+        </ul>
+
+        <div class="footer">
+            <div class="build-info">
+                <div class="search-icon">🔍</div>
+                <span>Build: 262119</span>
+            </div>
+            <div class="page-info">1 / 9</div>
+        </div>
+    </div>
+
+    <div class="controls-hint">
+        ↑↓ Navigate • Enter Select • ESC Close
     </div>
 
     <script>
-        function action(cmd) {
+        let currentIndex = 0;
+        const menuItems = document.querySelectorAll('.menu-item');
+        const totalItems = menuItems.length;
+
+        // İlk öğeyi aktif yap
+        function setActiveItem(index) {
+            menuItems.forEach(item => item.classList.remove('active'));
+            menuItems[index].classList.add('active');
+        }
+
+        // Keyboard kontrolleri
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowUp':
+                    e.preventDefault();
+                    currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+                    setActiveItem(currentIndex);
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    currentIndex = (currentIndex + 1) % totalItems;
+                    setActiveItem(currentIndex);
+                    break;
+                    
+                case 'Enter':
+                    e.preventDefault();
+                    selectCurrentItem();
+                    break;
+                    
+                case 'Escape':
+                    e.preventDefault();
+                    closeMenu();
+                    break;
+            }
+        });
+
+        // Mouse kontrolü (opsiyonel)
+        menuItems.forEach((item, index) => {
+            item.addEventListener('mouseenter', () => {
+                currentIndex = index;
+                setActiveItem(currentIndex);
+            });
+            
+            item.addEventListener('click', () => {
+                selectCurrentItem();
+            });
+        });
+
+        // Mevcut öğeyi seç
+        function selectCurrentItem() {
+            const activeItem = menuItems[currentIndex];
+            const action = activeItem.getAttribute('data-action');
+            
             // Lua'ya mesaj gönder
             parent.postMessage({
-                type: 'action',
-                command: cmd
+                type: 'menuAction',
+                action: action,
+                category: action
             }, '*');
             
-            console.log('Komut:', cmd);
+            console.log('Selected:', action);
+            
+            // Alt menü simülasyonu için
+            if (action !== 'search') {
+                showSubMenu(action);
+            }
         }
-        
+
+        // Alt menü gösterimi
+        function showSubMenu(category) {
+            const subMenus = {
+                player: ['God Mode', 'Infinite Health', 'Fast Run', 'Super Jump'],
+                server: ['Change Weather', 'Set Time', 'Teleport All', 'Server Info'],
+                weapon: ['Give All Weapons', 'Infinite Ammo', 'No Recoil', 'Damage Modifier'],
+                combat: ['Aimbot', 'ESP', 'No Spread', 'Auto Aim'],
+                vehicle: ['Spawn Vehicle', 'God Mode Vehicle', 'Super Speed', 'Fly Mode'],
+                visual: ['Crosshair', 'Player Names', 'Bone ESP', 'Radar'],
+                miscellaneous: ['Teleport', 'Speed Hack', 'Fly Hack', 'Misc Options'],
+                settings: ['Key Bindings', 'Menu Settings', 'Config', 'Save/Load']
+            };
+
+            const items = subMenus[category] || [];
+            
+            // Alt menü HTML'i oluştur
+            let subMenuHtml = `
+                <div class="menu-title">${category.charAt(0).toUpperCase() + category.slice(1)} menu</div>
+                <ul class="menu-items">
+            `;
+            
+            items.forEach((item, index) => {
+                subMenuHtml += `
+                    <li class="menu-item ${index === 0 ? 'active' : ''}" data-action="${item.toLowerCase().replace(/\s+/g, '_')}">
+                        <span>${item}</span>
+                        <span class="arrow">»</span>
+                    </li>
+                `;
+            });
+            
+            subMenuHtml += `
+                <li class="menu-item" data-action="back">
+                    <span>← Back to Main</span>
+                    <span class="arrow"></span>
+                </li>
+            </ul>`;
+
+            // Menü içeriğini güncelle
+            const menuContainer = document.querySelector('.menu-items').parentElement;
+            menuContainer.innerHTML = subMenuHtml + `
+                <div class="footer">
+                    <div class="build-info">
+                        <div class="search-icon">🔍</div>
+                        <span>Build: 262119</span>
+                    </div>
+                    <div class="page-info">1 / ${items.length + 1}</div>
+                </div>
+            `;
+            
+            // Event listener'ları yeniden ekle
+            setTimeout(setupSubMenu, 100);
+        }
+
+        // Alt menü setup
+        function setupSubMenu() {
+            const subMenuItems = document.querySelectorAll('.menu-item');
+            let subCurrentIndex = 0;
+            
+            // Keyboard kontrolleri
+            document.onkeydown = function(e) {
+                switch(e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        subCurrentIndex = (subCurrentIndex - 1 + subMenuItems.length) % subMenuItems.length;
+                        setActiveSubItem(subCurrentIndex);
+                        break;
+                        
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        subCurrentIndex = (subCurrentIndex + 1) % subMenuItems.length;
+                        setActiveSubItem(subCurrentIndex);
+                        break;
+                        
+                    case 'Enter':
+                        e.preventDefault();
+                        selectSubMenuItem(subCurrentIndex);
+                        break;
+                        
+                    case 'Escape':
+                        e.preventDefault();
+                        location.reload(); // Ana menüye dön
+                        break;
+                }
+            };
+            
+            function setActiveSubItem(index) {
+                subMenuItems.forEach(item => item.classList.remove('active'));
+                subMenuItems[index].classList.add('active');
+            }
+            
+            function selectSubMenuItem(index) {
+                const activeItem = subMenuItems[index];
+                const action = activeItem.getAttribute('data-action');
+                
+                if (action === 'back') {
+                    location.reload();
+                } else {
+                    parent.postMessage({
+                        type: 'menuAction',
+                        action: action
+                    }, '*');
+                    console.log('Sub-menu action:', action);
+                }
+            }
+            
+            // Mouse eventi
+            subMenuItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', () => {
+                    subCurrentIndex = index;
+                    setActiveSubItem(subCurrentIndex);
+                });
+                
+                item.addEventListener('click', () => {
+                    selectSubMenuItem(subCurrentIndex);
+                });
+            });
+        }
+
+        // Menü kapatma
         function closeMenu() {
             parent.postMessage({
-                type: 'close'
+                type: 'closeMenu'
             }, '*');
         }
-        
-        // ESC ile kapat
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeMenu();
+
+        // Lua'dan gelen mesajları dinle
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            
+            switch(data.type) {
+                case 'showNotification':
+                    console.log('Notification:', data.message);
+                    break;
+                case 'hideMenu':
+                    document.body.style.opacity = '0';
+                    break;
+                case 'showMenu':
+                    document.body.style.opacity = '1';
+                    break;
+            }
         });
-        
-        console.log('Menü hazır!');
+
+        console.log('🎮 Phaze Menu loaded and ready!');
+        console.log('🎯 Controls: ↑↓ Navigate, Enter Select, ESC Close');
     </script>
 </body>
 </html>
