@@ -4,19 +4,28 @@
     <meta charset="UTF-8">
     <title>FiveM Advanced Menu</title>
     <style>
-        body {
+        * {
             margin: 0;
-            background: transparent;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
+            /* Macho DUI için ekstra şeffaflık */
+            -webkit-app-region: no-drag;
         }
         
         .menu-container {
-            background: linear-gradient(135deg, rgba(15, 15, 25, 0.95), rgba(25, 25, 45, 0.95));
+            background: linear-gradient(135deg, rgba(15, 15, 25, 0.98), rgba(25, 25, 45, 0.98));
             border-radius: 12px;
             width: 320px;
             height: 480px;
@@ -27,11 +36,13 @@
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            /* Macho DUI için */
+            z-index: 9999;
         }
         
         /* Header */
         .header {
-            background: linear-gradient(90deg, rgba(50, 100, 200, 0.8), rgba(100, 150, 255, 0.8));
+            background: linear-gradient(90deg, rgba(50, 100, 200, 0.9), rgba(100, 150, 255, 0.9));
             padding: 12px 20px;
             text-align: center;
             color: white;
@@ -43,7 +54,7 @@
         
         /* Sub Header (Tabs) */
         .sub-header {
-            background: rgba(20, 20, 35, 0.9);
+            background: rgba(20, 20, 35, 0.95);
             height: 45px;
             display: flex;
             align-items: center;
@@ -66,7 +77,7 @@
         }
         
         .tab.active {
-            background: linear-gradient(135deg, rgba(50, 100, 200, 0.6), rgba(100, 150, 255, 0.6));
+            background: linear-gradient(135deg, rgba(50, 100, 200, 0.7), rgba(100, 150, 255, 0.7));
             color: white;
             transform: translateY(-2px);
         }
@@ -75,13 +86,13 @@
         .content {
             flex: 1;
             padding: 8px;
-            background: rgba(8, 8, 8, 0.7);
+            background: rgba(8, 8, 8, 0.8);
             overflow: hidden;
             position: relative;
         }
         
         .menu-item {
-            background: linear-gradient(135deg, rgba(25, 25, 35, 0.8), rgba(35, 35, 50, 0.8));
+            background: linear-gradient(135deg, rgba(25, 25, 35, 0.9), rgba(35, 35, 50, 0.9));
             margin: 4px 0;
             padding: 12px 16px;
             border-radius: 8px;
@@ -98,10 +109,10 @@
         }
         
         .menu-item.selected {
-            background: linear-gradient(135deg, rgba(50, 100, 200, 0.7), rgba(100, 150, 255, 0.7));
+            background: linear-gradient(135deg, rgba(50, 100, 200, 0.8), rgba(100, 150, 255, 0.8));
             color: white;
-            border-color: rgba(100, 150, 255, 0.8);
-            box-shadow: 0 0 20px rgba(100, 150, 255, 0.4);
+            border-color: rgba(100, 150, 255, 0.9);
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.5);
             transform: translateX(0px) scale(1.02);
             opacity: 1;
         }
@@ -118,7 +129,7 @@
         
         /* Footer */
         .footer {
-            background: rgba(15, 15, 25, 0.9);
+            background: rgba(15, 15, 25, 0.95);
             padding: 8px 16px;
             display: flex;
             justify-content: space-between;
@@ -169,7 +180,7 @@
         }
         
         .main-menu-item.selected {
-            background: linear-gradient(135deg, rgba(60, 120, 200, 0.8), rgba(100, 150, 255, 0.8));
+            background: linear-gradient(135deg, rgba(60, 120, 200, 0.9), rgba(100, 150, 255, 0.9));
         }
         
         /* Search bar */
@@ -493,12 +504,17 @@
             renderMenuItems();
         }
         
-        // Input handling
-        function handleKeyPress(key) {
+        // Macho DUI için özel input handling
+        function machoDuiKeyHandler(key) {
+            console.log('Macho DUI Key:', key);
+            
             const currentItems = getCurrentItems();
             
             switch (key) {
                 case 'ArrowUp':
+                case 'Up':
+                case 'W':
+                case 'w':
                     menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
                     if (menuState.selectedIndex === -1) {
                         menuState.selectedIndex = currentItems.length - 1;
@@ -507,6 +523,9 @@
                     break;
                     
                 case 'ArrowDown':
+                case 'Down':
+                case 'S':
+                case 's':
                     menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
                     if (menuState.selectedIndex >= currentItems.length) {
                         menuState.selectedIndex = 0;
@@ -515,10 +534,14 @@
                     break;
                     
                 case 'Enter':
+                case 'Return':
+                case 'Space':
                     handleEnterPress();
                     break;
                     
                 case 'Backspace':
+                case 'Back':
+                case 'Escape':
                     if (menuState.level !== "main") {
                         menuState.level = "main";
                         menuState.isSearching = false;
@@ -529,32 +552,44 @@
                     break;
                     
                 case 'KeyQ':
+                case 'Q':
+                case 'q':
+                case 'ArrowLeft':
+                case 'Left':
+                case 'A':
+                case 'a':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
                             menuState.selectedSubCategory = Math.max(0, menuState.selectedSubCategory - 1);
                             resetSelection();
                         }
+                    } else {
+                        handleSliderInput(false);
                     }
                     break;
                     
                 case 'KeyE':
+                case 'E':
+                case 'e':
+                case 'ArrowRight':
+                case 'Right':
+                case 'D':
+                case 'd':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
                             menuState.selectedSubCategory = Math.min(config.subCategories.length - 1, menuState.selectedSubCategory + 1);
                             resetSelection();
                         }
+                    } else {
+                        handleSliderInput(true);
                     }
-                    break;
-                    
-                case 'ArrowLeft':
-                case 'ArrowRight':
-                    handleSliderInput(key === 'ArrowRight');
                     break;
             }
             
             render();
+            return true; // Indicate handled
         }
         
         function handleEnterPress() {
@@ -647,22 +682,39 @@
         
         function sendMessageToLua(data) {
             try {
-                // FiveM için doğru mesaj gönderme yöntemi
+                console.log('Attempting to send to Lua:', data);
+                
+                // Macho DUI için özel mesaj gönderimi
+                if (window.parent && window.parent.postMessage) {
+                    window.parent.postMessage(data, '*');
+                    console.log('Sent via postMessage');
+                }
+                
+                // Alternative: Execute command via window object
                 if (window.invokeNative) {
-                    // Executor DUI için
                     const command = `menu_action ${JSON.stringify(data).replace(/"/g, '\\"')}`;
                     window.invokeNative('ExecuteCommand', command);
-                } else {
-                    // Normal postMessage fallback
-                    parent.postMessage(data, '*');
+                    console.log('Sent via invokeNative');
                 }
-                console.log('Sent to Lua:', data);
+                
+                // Macho DUI direct call
+                if (typeof SendNUIMessage !== 'undefined') {
+                    SendNUIMessage(data);
+                    console.log('Sent via SendNUIMessage');
+                }
+                
             } catch (e) {
                 console.error('Failed to send message to Lua:', e);
             }
         }
         
-        // Lua'dan mesaj alma fonksiyonu
+        // Lua'dan mesaj alma fonksiyonu - Macho DUI için
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type) {
+                receiveMessage(event.data);
+            }
+        });
+        
         window.receiveMessage = function(data) {
             console.log('Received from Lua:', data);
             
@@ -670,7 +722,15 @@
                 updateOnlinePlayersList(data.players);
             } else if (data.type === 'notification') {
                 showNotification(data.message, data.type);
+            } else if (data.type === 'keyPress') {
+                // Lua'dan gelen tuş basımlarını işle
+                machoDuiKeyHandler(data.key);
             }
+        };
+        
+        // Global keyboard handler - Macho DUI için
+        window.handleKey = function(key) {
+            return machoDuiKeyHandler(key);
         };
         
         // Online oyuncular listesini güncelle
@@ -714,12 +774,12 @@
             });
         }
         
-        // Event listeners
+        // Fallback event listeners (normal klavye için)
         document.addEventListener('keydown', (e) => {
             e.preventDefault();
             
             // Handle search input
-            if (menuState.level === "search" && e.key.length === 1) {
+            if (menuState.level === "search" && e.key.length === 1 && /^[a-zA-Z0-9 ]$/.test(e.key)) {
                 menuState.searchQuery += e.key;
                 performSearch(menuState.searchQuery);
                 resetSelection();
@@ -735,14 +795,8 @@
                 return;
             }
             
-            handleKeyPress(e.code);
-        });
-        
-        // Close menu on ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                sendMessageToLua({ type: 'close' });
-            }
+            // Use the Macho DUI key handler
+            machoDuiKeyHandler(e.key);
         });
         
         // Initial render
@@ -753,7 +807,18 @@
             requestPlayerList();
         }, 1000);
         
-        console.log('Advanced FiveM Menu loaded successfully!');
+        // Debug için console log
+        console.log('🎮 Advanced FiveM Menu loaded successfully!');
+        console.log('📋 Menu State:', menuState);
+        console.log('🔧 Macho DUI compatible version');
+        
+        // Test mesajı gönder
+        setTimeout(() => {
+            sendMessageToLua({
+                type: 'menuLoaded',
+                message: 'Menu HTML loaded successfully'
+            });
+        }, 500);
     </script>
 </body>
 </html>
