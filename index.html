@@ -594,13 +594,21 @@
                         sendMessageToLua({
                             type: 'toggle',
                             item: item.name,
-                            value: item.value
+                            value: item.value,
+                            playerId: item.playerId || null
                         });
                     } else if (item.type === 'button') {
                         // Send button press to Lua
                         sendMessageToLua({
                             type: 'button',
                             item: item.name
+                        });
+                    } else if (item.type === 'clothing' || item.type === 'slider') {
+                        // Slider ve clothing için değer gönder
+                        sendMessageToLua({
+                            type: item.type,
+                            item: item.name,
+                            value: item.value
                         });
                     }
                 }
@@ -639,11 +647,71 @@
         
         function sendMessageToLua(data) {
             try {
-                parent.postMessage(data, '*');
+                // FiveM için doğru mesaj gönderme yöntemi
+                if (window.invokeNative) {
+                    // Executor DUI için
+                    const command = `menu_action ${JSON.stringify(data).replace(/"/g, '\\"')}`;
+                    window.invokeNative('ExecuteCommand', command);
+                } else {
+                    // Normal postMessage fallback
+                    parent.postMessage(data, '*');
+                }
                 console.log('Sent to Lua:', data);
             } catch (e) {
                 console.error('Failed to send message to Lua:', e);
             }
+        }
+        
+        // Lua'dan mesaj alma fonksiyonu
+        window.receiveMessage = function(data) {
+            console.log('Received from Lua:', data);
+            
+            if (data.type === 'updatePlayers') {
+                updateOnlinePlayersList(data.players);
+            } else if (data.type === 'notification') {
+                showNotification(data.message, data.type);
+            }
+        };
+        
+        // Online oyuncular listesini güncelle
+        function updateOnlinePlayersList(players) {
+            // Online kategorisindeki oyuncu listesini güncelle
+            const onlineConfig = categoryConfigs.Online;
+            if (onlineConfig && onlineConfig.items.List) {
+                // Statik öğeleri koru, oyuncuları ekle
+                const staticItems = onlineConfig.items.List.filter(item => 
+                    !item.name.startsWith('[') || !item.name.includes(']')
+                );
+                
+                const playerItems = players.map(player => ({
+                    name: `[${player.id}] ${player.name}`,
+                    type: "toggle",
+                    value: false,
+                    icon: "👤",
+                    playerId: player.id,
+                    distance: player.distance
+                }));
+                
+                onlineConfig.items.List = [...staticItems, ...playerItems];
+                
+                // Eğer Online/List kategorisindeyse render et
+                if (menuState.level === "Online" && 
+                    categoryConfigs.Online.subCategories[menuState.selectedSubCategory] === "List") {
+                    render();
+                }
+            }
+        }
+        
+        // Bildirim gösterme
+        function showNotification(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // Menü açıldığında oyuncu listesini iste
+        function requestPlayerList() {
+            sendMessageToLua({
+                type: 'requestPlayers'
+            });
         }
         
         // Event listeners
@@ -679,6 +747,11 @@
         
         // Initial render
         render();
+        
+        // Oyuncu listesini başlangıçta iste
+        setTimeout(() => {
+            requestPlayerList();
+        }, 1000);
         
         console.log('Advanced FiveM Menu loaded successfully!');
     </script>
