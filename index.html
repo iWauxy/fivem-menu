@@ -10,16 +10,18 @@
             box-sizing: border-box;
         }
         
-        html,         body {
+        html, body {
             margin: 0;
             padding: 0;
-            background: none !important;
+            background: transparent !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            /* Macho DUI için tamamen şeffaf */
-            -webkit-app-region: no-drag;
-            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
+            overflow: hidden;
+            /* Macho DUI için ekstra şeffaflık */
+            -webkit-app-region: no-drag;
         }
         
         .menu-container {
@@ -32,10 +34,7 @@
             backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
             overflow: hidden;
             /* Macho DUI için */
             z-index: 9999;
@@ -514,6 +513,8 @@
             switch (key) {
                 case 'ArrowUp':
                 case 'Up':
+                case 'W':
+                case 'w':
                     menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
                     if (menuState.selectedIndex === -1) {
                         menuState.selectedIndex = currentItems.length - 1;
@@ -523,6 +524,8 @@
                     
                 case 'ArrowDown':
                 case 'Down':
+                case 'S':
+                case 's':
                     menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
                     if (menuState.selectedIndex >= currentItems.length) {
                         menuState.selectedIndex = 0;
@@ -551,10 +554,10 @@
                 case 'KeyQ':
                 case 'Q':
                 case 'q':
-                case 'A':
-                case 'a':
                 case 'ArrowLeft':
                 case 'Left':
+                case 'A':
+                case 'a':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -569,10 +572,10 @@
                 case 'KeyE':
                 case 'E':
                 case 'e':
-                case 'D':
-                case 'd':
                 case 'ArrowRight':
                 case 'Right':
+                case 'D':
+                case 'd':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
