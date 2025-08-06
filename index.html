@@ -148,6 +148,11 @@
             width: 4px;
             background: rgba(100, 150, 255, 0.2);
             border-radius: 2px;
+            display: none; /* Initially hidden */
+        }
+        
+        .scrollbar.visible {
+            display: block;
         }
         
         .scrollbar-handle {
@@ -156,6 +161,7 @@
             width: 100%;
             position: absolute;
             transition: all 0.3s ease;
+            min-height: 20px;
         }
         
         /* Animations */
@@ -344,19 +350,21 @@
         
         function updateScrollbar() {
             const currentItems = getCurrentItems();
+            const scrollbar = document.getElementById('scrollHandle').parentElement;
             const scrollHandle = document.getElementById('scrollHandle');
             
             if (currentItems.length <= menuState.maxDisplayItems) {
-                scrollHandle.style.display = 'none';
+                scrollbar.classList.remove('visible');
                 return;
             }
             
-            scrollHandle.style.display = 'block';
-            const handleHeight = (menuState.maxDisplayItems / currentItems.length) * 100;
-            const handlePosition = (menuState.scrollOffset / (currentItems.length - menuState.maxDisplayItems)) * (100 - handleHeight);
+            scrollbar.classList.add('visible');
+            const handleHeight = Math.max(20, (menuState.maxDisplayItems / currentItems.length) * 100);
+            const maxPosition = 100 - handleHeight;
+            const handlePosition = (menuState.scrollOffset / (currentItems.length - menuState.maxDisplayItems)) * maxPosition;
             
             scrollHandle.style.height = handleHeight + '%';
-            scrollHandle.style.top = handlePosition + '%';
+            scrollHandle.style.top = Math.max(0, Math.min(maxPosition, handlePosition)) + '%';
         }
         
         function getCurrentItems() {
@@ -513,8 +521,6 @@
             switch (key) {
                 case 'ArrowUp':
                 case 'Up':
-                case 'W':
-                case 'w':
                     menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
                     if (menuState.selectedIndex === -1) {
                         menuState.selectedIndex = currentItems.length - 1;
@@ -524,8 +530,6 @@
                     
                 case 'ArrowDown':
                 case 'Down':
-                case 'S':
-                case 's':
                     menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
                     if (menuState.selectedIndex >= currentItems.length) {
                         menuState.selectedIndex = 0;
@@ -556,8 +560,6 @@
                 case 'q':
                 case 'ArrowLeft':
                 case 'Left':
-                case 'A':
-                case 'a':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -574,8 +576,6 @@
                 case 'e':
                 case 'ArrowRight':
                 case 'Right':
-                case 'D':
-                case 'd':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
