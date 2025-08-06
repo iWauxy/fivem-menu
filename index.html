@@ -13,14 +13,13 @@
         html, body {
             margin: 0;
             padding: 0;
-            background: transparent !important;
+            background: transparent;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            /* Macho DUI için ekstra şeffaflık */
             -webkit-app-region: no-drag;
         }
         
@@ -504,7 +503,7 @@
             renderMenuItems();
         }
         
-        // Macho DUI için özel input handling
+        // Macho DUI için özel input handling (Düzeltilmiş Versiyon)
         function machoDuiKeyHandler(key) {
             console.log('Macho DUI Key:', key);
             
@@ -513,23 +512,13 @@
             switch (key) {
                 case 'ArrowUp':
                 case 'Up':
-                case 'W':
-                case 'w':
-                    menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
-                    if (menuState.selectedIndex === -1) {
-                        menuState.selectedIndex = currentItems.length - 1;
-                    }
+                    menuState.selectedIndex = (menuState.selectedIndex - 1 + currentItems.length) % currentItems.length;
                     updateScrollOffset();
                     break;
                     
                 case 'ArrowDown':
                 case 'Down':
-                case 'S':
-                case 's':
-                    menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
-                    if (menuState.selectedIndex >= currentItems.length) {
-                        menuState.selectedIndex = 0;
-                    }
+                    menuState.selectedIndex = (menuState.selectedIndex + 1) % currentItems.length;
                     updateScrollOffset();
                     break;
                     
@@ -543,47 +532,51 @@
                 case 'Back':
                 case 'Escape':
                     if (menuState.level !== "main") {
+                        if (menuState.isSearching) {
+                            menuState.isSearching = false;
+                            menuState.searchQuery = "";
+                        }
                         menuState.level = "main";
-                        menuState.isSearching = false;
-                        menuState.searchQuery = "";
                         menuState.selectedSubCategory = 0;
                         resetSelection();
+                    } else {
+                        sendMessageToLua({ type: 'close' });
                     }
                     break;
-                    
-                case 'KeyQ':
-                case 'Q':
-                case 'q':
+
+                // --- AYRILMIŞ KONTROLLER ---
+
+                // Sadece Slider/Giyim için Sol Yön Tuşu
                 case 'ArrowLeft':
                 case 'Left':
-                case 'A':
-                case 'a':
+                    handleSliderInput(false);
+                    break;
+
+                // Sadece Slider/Giyim için Sağ Yön Tuşu
+                case 'ArrowRight':
+                case 'Right':
+                    handleSliderInput(true);
+                    break;
+
+                // Sadece Sekme Değişimi için Q Tuşu
+                case 'Q':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
-                        if (config) {
-                            menuState.selectedSubCategory = Math.max(0, menuState.selectedSubCategory - 1);
+                        if (config && config.subCategories.length > 1) {
+                            menuState.selectedSubCategory = (menuState.selectedSubCategory - 1 + config.subCategories.length) % config.subCategories.length;
                             resetSelection();
                         }
-                    } else {
-                        handleSliderInput(false);
                     }
                     break;
                     
-                case 'KeyE':
+                // Sadece Sekme Değişimi için E Tuşu
                 case 'E':
-                case 'e':
-                case 'ArrowRight':
-                case 'Right':
-                case 'D':
-                case 'd':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
-                        if (config) {
-                            menuState.selectedSubCategory = Math.min(config.subCategories.length - 1, menuState.selectedSubCategory + 1);
+                        if (config && config.subCategories.length > 1) {
+                            menuState.selectedSubCategory = (menuState.selectedSubCategory + 1) % config.subCategories.length;
                             resetSelection();
                         }
-                    } else {
-                        handleSliderInput(true);
                     }
                     break;
             }
