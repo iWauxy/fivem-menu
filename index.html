@@ -535,15 +535,28 @@
                         menuState.selectedSubCategory = 0;
                         resetSelection();
                     } else {
-                        // Ana menüdeyken backspace'e basılırsa menüyü kapat
                         sendMessageToLua({ type: 'close' });
                     }
                     break;
+
+                // --- YENİ AYRILMIŞ KONTROLLER ---
+
+                // Sadece Slider/Giyim için Sol Yön Tuşu
+                case 'ArrowLeft':
+                case 'Left':
+                    handleSliderInput(false);
+                    break;
+
+                // Sadece Slider/Giyim için Sağ Yön Tuşu
+                case 'ArrowRight':
+                case 'Right':
+                    handleSliderInput(true);
+                    break;
+
+                // Sadece Sekme Değişimi için Q Tuşu
                 case 'KeyQ':
                 case 'Q':
                 case 'q':
-                case 'ArrowLeft':
-                case 'Left':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config && config.subCategories.length > 1) {
@@ -551,13 +564,11 @@
                             resetSelection();
                         }
                     }
-                    handleSliderInput(false); // Slider/Clothing için de çalışır
                     break;
+                // Sadece Sekme Değişimi için E Tuşu
                 case 'KeyE':
                 case 'E':
                 case 'e':
-                case 'ArrowRight':
-                case 'Right':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config && config.subCategories.length > 1) {
@@ -565,7 +576,6 @@
                             resetSelection();
                         }
                     }
-                    handleSliderInput(true); // Slider/Clothing için de çalışır
                     break;
             }
             render();
