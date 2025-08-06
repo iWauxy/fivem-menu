@@ -4,385 +4,266 @@
     <meta charset="UTF-8">
     <title>Heisenberg Menu</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        /* Google Fonts - Daha modern bir görünüm için */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
         :root {
-            --bg-primary: #111827;
-            --bg-secondary: #1F2937;
-            --bg-tertiary: #374151;
-            --accent-primary: #3b82f6;
-            --accent-secondary: #60a5fa;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
+            --background: rgba(20, 20, 25, 0.95);
+            --header-bg: rgba(30, 30, 35, 0.98);
+            --accent: #007bff;
+            --accent-hover: #0056b3;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
+        /* En Önemli Kısım: Arka planı şeffaf yap */
         body {
             background: transparent;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text-primary);
-            margin: 0;
-            padding: 0;
             overflow: hidden;
             user-select: none;
         }
-
-        .menu-wrapper {
+        
+        #menu-container {
             position: absolute;
             left: 50px;
             top: 50px;
-            width: 550px;
-            display: none; /* Initially hidden, controlled by JS */
-            flex-direction: row;
-            gap: 15px;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-        }
-
-        .menu-wrapper.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        
-        .main-container {
-            background-color: var(--bg-primary);
+            width: 280px;
+            background: var(--background);
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            width: 250px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            display: none; /* JS ile kontrol edilecek */
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+        }
+
+        #menu-container.visible {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
         }
 
         .header {
-            padding: 15px;
+            padding: 12px;
             text-align: center;
-            background-color: var(--bg-secondary);
+            background: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
-            border-radius: 8px 8px 0 0;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            color: var(--accent-primary);
+            color: var(--accent);
+            border-radius: 7px 7px 0 0;
+        }
+        
+        .menu-title {
+            padding: 8px 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
         }
 
-        .category-list, .item-list {
+        .menu-items {
             list-style: none;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
-        .list-item {
-            padding: 12px 15px;
-            margin-bottom: 5px;
+        .menu-item {
+            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.15s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .list-item:hover {
-            background-color: var(--bg-tertiary);
-        }
-
-        .list-item.active {
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            color: var(--text-primary);
-            font-weight: 500;
+            font-size: 15px;
         }
         
-        .sub-container {
-            background-color: var(--bg-primary);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px_30px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            width: 285px;
+        .menu-item.active {
+            background-color: var(--accent);
+            color: white;
         }
-
-        .tabs {
-            display: flex;
-            background-color: var(--bg-secondary);
-            border-radius: 8px 8px 0 0;
-            padding: 5px;
-            overflow-x: auto;
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
-        }
-        .tabs::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-
-        .tab {
-            padding: 8px 12px;
-            text-align: center;
-            flex-grow: 1;
-            cursor: pointer;
-            border-radius: 5px;
+        
+        .menu-item .value {
             font-size: 14px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            white-space: nowrap;
-        }
-        
-        .tab:hover {
-            background-color: var(--bg-tertiary);
-        }
-
-        .tab.active {
-            background-color: var(--accent-primary);
-            color: var(--text-primary);
-        }
-
-        .value-display {
             color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .list-item.active .value-display {
-            color: var(--text-primary);
         }
         
+        .menu-item.active .value {
+            color: white;
+        }
+
         .footer {
-            margin-top: auto;
-            padding: 10px 15px;
+            padding: 8px 15px;
+            text-align: right;
             font-size: 12px;
             color: var(--text-secondary);
             border-top: 1px solid var(--border-color);
-            background-color: var(--bg-secondary);
-            border-radius: 0 0 8px 8px;
-            text-align: center;
         }
-
     </style>
 </head>
 <body>
-
-    <div class="menu-wrapper" id="menu-wrapper">
-        <div class="main-container">
-            <div class="header">
-                <h1 id="menu-title">Heisenberg</h1>
-            </div>
-            <ul class="category-list" id="category-list">
-                </ul>
-             <div class="footer" id="main-footer"></div>
-        </div>
-        <div class="sub-container" id="sub-container">
-             <div class="tabs" id="tabs">
-                </div>
-            <ul class="item-list" id="item-list">
-                 </ul>
-             <div class="footer" id="sub-footer"></div>
+    <div id="menu-container">
+        <div class="header">Heisenberg</div>
+        <div class="menu-title" id="menu-title"></div>
+        <ul class="menu-items" id="menu-items"></ul>
+        <div class="footer">
+            <span id="item-counter"></span>
         </div>
     </div>
 
     <script>
-        // --- STATE MANAGEMENT ---
-        let menuConfig = {};
-        let activeCategory = '';
-        let activeSubCategory = '';
-        let categoryIndex = 0;
-        let itemIndex = 0;
-        let menuVisible = false;
-
-        // --- NUI MESSAGE HANDLING ---
-        const sendNuiMessage = (type, payload = {}) => {
-            fetch(`https://macho/${type}`, {
+        // --- NUI İLETİŞİMİ ---
+        // Lua'ya mesaj göndermek için bu fonksiyonu kullanacağız
+        const sendAction = (action, params = {}) => {
+            fetch(`https://macho/executeAction`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-                body: JSON.stringify(payload)
-            }).catch(err => console.error("NUI Message Failed:", err));
+                body: JSON.stringify({ action, params })
+            }).catch(err => console.error("Action Failed:", err));
         };
         
+        // --- MENÜ VERİLERİ (Basit ve Anlaşılır) ---
+        // Menünün tüm yapısı burada, statik olarak tanımlanmıştır.
+        const menuData = {
+            main: {
+                title: 'Ana Menü',
+                items: [
+                    { name: 'Player', subMenu: 'player' },
+                    { name: 'Vehicle', subMenu: 'vehicle' },
+                    { name: 'Tools', subMenu: 'tools' },
+                    // Buraya yeni ana kategoriler ekleyebilirsin
+                ]
+            },
+            player: {
+                title: 'Player Seçenekleri',
+                items: [
+                    { name: 'God Mode', action: 'player_godmode' },
+                    { name: 'Heal', action: 'player_heal' },
+                    { name: 'Invisible', action: 'player_invisible' },
+                    { name: 'No Ragdoll', action: 'player_noragdoll' },
+                    { name: 'Noclip', action: 'player_noclip' },
+                ]
+            },
+            vehicle: {
+                title: 'Araç Seçenekleri',
+                items: [
+                    { name: 'Spawn T20', action: 'vehicle_spawn', params: { model: 't20' } },
+                    { name: 'Spawn Zentorno', action: 'vehicle_spawn', params: { model: 'zentorno' } },
+                    { name: 'Repair Vehicle', action: 'vehicle_repair' },
+                    { name: 'Vehicle God Mode', action: 'vehicle_godmode' },
+                ]
+            },
+            tools: {
+                title: 'Araçlar',
+                items: [
+                    { name: 'Advanced Freecam', action: 'tools_freecam' },
+                ]
+            },
+        };
+
+        // --- MENÜ KONTROL MANTIĞI ---
+        let currentMenu = 'main';
+        let selectedIndex = 0;
+        const menuHistory = []; // Geri gitmek için
+
+        function renderMenu() {
+            const container = document.getElementById('menu-items');
+            const title = document.getElementById('menu-title');
+            const counter = document.getElementById('item-counter');
+            
+            container.innerHTML = ''; // Listeyi temizle
+            
+            const menu = menuData[currentMenu];
+            if (!menu) return;
+
+            title.textContent = menu.title;
+
+            menu.items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'menu-item';
+                if (index === selectedIndex) {
+                    li.classList.add('active');
+                }
+                li.textContent = item.name;
+                container.appendChild(li);
+            });
+            
+            counter.textContent = `${selectedIndex + 1} / ${menu.items.length}`;
+        }
+        
+        function navigate(direction) {
+            const menu = menuData[currentMenu];
+            const itemCount = menu.items.length;
+            
+            if (direction === 'up') {
+                selectedIndex = (selectedIndex - 1 + itemCount) % itemCount;
+            } else if (direction === 'down') {
+                selectedIndex = (selectedIndex + 1) % itemCount;
+            }
+            renderMenu();
+        }
+
+        function selectItem() {
+            const item = menuData[currentMenu].items[selectedIndex];
+            if (!item) return;
+
+            if (item.subMenu) {
+                menuHistory.push(currentMenu);
+                currentMenu = item.subMenu;
+                selectedIndex = 0;
+            } else if (item.action) {
+                sendAction(item.action, item.params);
+            }
+            renderMenu();
+        }
+
+        function goBack() {
+            if (menuHistory.length > 0) {
+                currentMenu = menuHistory.pop();
+                selectedIndex = 0;
+                renderMenu();
+            } else {
+                // Ana menüde geri tuşuna basılırsa menüyü kapat
+                sendAction('closeMenu');
+            }
+        }
+        
+        // --- EVENT LISTENERS ---
         window.addEventListener('message', (event) => {
-            const { type, payload } = event.data;
+            const { type } = event.data;
+            const container = document.getElementById('menu-container');
 
             if (type === 'show') {
-                menuConfig = payload.config;
-                activeCategory = Object.keys(menuConfig)[0];
-                activeSubCategory = menuConfig[activeCategory].subCategories[0];
-                categoryIndex = 0;
-                itemIndex = 0;
-                render();
-                document.getElementById('menu-wrapper').style.display = 'flex';
-                setTimeout(() => { 
-                    document.getElementById('menu-wrapper').classList.add('visible');
-                    menuVisible = true;
-                }, 10);
-
+                container.classList.add('visible');
+                currentMenu = 'main';
+                selectedIndex = 0;
+                menuHistory.length = 0;
+                renderMenu();
             } else if (type === 'hide') {
-                document.getElementById('menu-wrapper').classList.remove('visible');
-                 setTimeout(() => { 
-                    document.getElementById('menu-wrapper').style.display = 'none';
-                    menuVisible = false;
-                }, 300);
+                container.classList.remove('visible');
             }
         });
 
-        // --- RENDER FUNCTIONS ---
-        const render = () => {
-            if (!activeCategory || !menuConfig[activeCategory]) return;
-            renderCategories();
-            renderSubCategories();
-            renderItems();
-            updateFooters();
-        };
-        
-        const renderCategories = () => {
-            const catList = document.getElementById('category-list');
-            catList.innerHTML = '';
-            Object.keys(menuConfig).forEach((catName, index) => {
-                const li = document.createElement('li');
-                li.className = 'list-item';
-                if (index === categoryIndex) li.classList.add('active');
-                li.textContent = catName;
-                catList.appendChild(li);
-            });
-        };
-
-        const renderSubCategories = () => {
-            const tabs = document.getElementById('tabs');
-            tabs.innerHTML = '';
-            const subCategories = menuConfig[activeCategory].subCategories;
-            const subCategoryIdx = subCategories.indexOf(activeSubCategory);
-
-            subCategories.forEach((subCatName, index) => {
-                const tab = document.createElement('div');
-                tab.className = 'tab';
-                if (index === subCategoryIdx) tab.classList.add('active');
-                tab.textContent = subCatName;
-                tabs.appendChild(tab);
-            });
-        };
-
-        const renderItems = () => {
-            const itemList = document.getElementById('item-list');
-            itemList.innerHTML = '';
-            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
-
-            if (items.length === 0) {
-                itemList.innerHTML = '<li class="list-item">No items in this category.</li>';
-                return;
-            }
-
-            items.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'list-item';
-                if (index === itemIndex) li.classList.add('active');
-
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = item.name;
-
-                const valueSpan = document.createElement('span');
-                valueSpan.className = 'value-display';
-
-                switch (item.type) {
-                    case 'toggle':
-                        valueSpan.textContent = item.value ? 'ON' : 'OFF';
-                        break;
-                    case 'slider':
-                        valueSpan.textContent = `< ${item.value.toFixed(2)} >`;
-                        break;
-                    case 'button':
-                        valueSpan.textContent = 'Execute';
-                        break;
-                    default:
-                         valueSpan.textContent = '>';
-                }
-
-                li.appendChild(nameSpan);
-                li.appendChild(valueSpan);
-                itemList.appendChild(li);
-            });
-        };
-
-        const updateFooters = () => {
-            document.getElementById('main-footer').textContent = `${categoryIndex + 1} / ${Object.keys(menuConfig).length}`;
-            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
-            document.getElementById('sub-footer').textContent = items.length > 0 ? `${itemIndex + 1} / ${items.length}` : '0 / 0';
-        };
-
-
-        // --- KEYBOARD INPUT HANDLING ---
         document.addEventListener('keydown', (e) => {
-            if (!menuVisible) return;
-            
+            const container = document.getElementById('menu-container');
+            if (!container.classList.contains('visible')) return;
+
             e.preventDefault();
 
-            const categories = Object.keys(menuConfig);
-            const subCategories = menuConfig[activeCategory].subCategories;
-            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
-            const currentItem = items[itemIndex];
-
             switch (e.key) {
-                case 'ArrowUp':
-                    itemIndex = (itemIndex - 1 + items.length) % items.length;
-                    break;
-                case 'ArrowDown':
-                    itemIndex = (itemIndex + 1) % items.length;
-                    break;
-                case 'PageUp': // Kategoriler arasında yukarı git
-                    categoryIndex = (categoryIndex - 1 + categories.length) % categories.length;
-                    activeCategory = categories[categoryIndex];
-                    activeSubCategory = menuConfig[activeCategory].subCategories[0];
-                    itemIndex = 0;
-                    break;
-                case 'PageDown': // Kategoriler arasında aşağı git
-                    categoryIndex = (categoryIndex + 1) % categories.length;
-                    activeCategory = categories[categoryIndex];
-                    activeSubCategory = menuConfig[activeCategory].subCategories[0];
-                    itemIndex = 0;
-                    break;
-                case 'ArrowLeft': {
-                    if (currentItem && currentItem.type === 'slider') {
-                        // Slider değeri azalt
-                        const step = (currentItem.max - currentItem.min) / 20;
-                        currentItem.value = Math.max(currentItem.min, currentItem.value - step);
-                        sendNuiMessage('updateItem', { category: activeCategory, itemName: currentItem.name, value: currentItem.value });
-                    } else {
-                        // Tab değiştir
-                        let subIndex = subCategories.indexOf(activeSubCategory);
-                        subIndex = (subIndex - 1 + subCategories.length) % subCategories.length;
-                        activeSubCategory = subCategories[subIndex];
-                        itemIndex = 0;
-                    }
-                    break;
-                }
-                case 'ArrowRight': {
-                     if (currentItem && currentItem.type === 'slider') {
-                        // Slider değeri artır
-                        const step = (currentItem.max - currentItem.min) / 20;
-                        currentItem.value = Math.min(currentItem.max, currentItem.value + step);
-                        sendNuiMessage('updateItem', { category: activeCategory, itemName: currentItem.name, value: currentItem.value });
-                    } else {
-                        // Tab değiştir
-                        let subIndex = subCategories.indexOf(activeSubCategory);
-                        subIndex = (subIndex + 1) % subCategories.length;
-                        activeSubCategory = subCategories[subIndex];
-                        itemIndex = 0;
-                    }
-                    break;
-                }
-                case 'Enter':
-                    if (currentItem) {
-                        sendNuiMessage('executeAction', { category: activeCategory, itemName: currentItem.name });
-                        if(currentItem.type === 'toggle') {
-                             currentItem.value = !currentItem.value; // Anında UI tepkisi için
-                        }
-                    }
-                    break;
-                case 'Escape':
-                    sendNuiMessage('closeMenu');
-                    break;
+                case 'ArrowUp': navigate('up'); break;
+                case 'ArrowDown': navigate('down'); break;
+                case 'Enter': selectItem(); break;
+                case 'Backspace': goBack(); break;
+                case 'Escape': sendAction('closeMenu'); break;
             }
-            render();
         });
     </script>
 </body>
