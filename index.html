@@ -13,14 +13,13 @@
         html, body {
             margin: 0;
             padding: 0;
-            background: transparent !important;
+            background: transparent;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            /* Macho DUI için ekstra şeffaflık */
             -webkit-app-region: no-drag;
         }
         
@@ -148,11 +147,6 @@
             width: 4px;
             background: rgba(100, 150, 255, 0.2);
             border-radius: 2px;
-            display: none; /* Initially hidden */
-        }
-        
-        .scrollbar.visible {
-            display: block;
         }
         
         .scrollbar-handle {
@@ -161,7 +155,6 @@
             width: 100%;
             position: absolute;
             transition: all 0.3s ease;
-            min-height: 20px;
         }
         
         /* Animations */
@@ -350,21 +343,19 @@
         
         function updateScrollbar() {
             const currentItems = getCurrentItems();
-            const scrollbar = document.getElementById('scrollHandle').parentElement;
             const scrollHandle = document.getElementById('scrollHandle');
             
             if (currentItems.length <= menuState.maxDisplayItems) {
-                scrollbar.classList.remove('visible');
+                scrollHandle.style.display = 'none';
                 return;
             }
             
-            scrollbar.classList.add('visible');
-            const handleHeight = Math.max(20, (menuState.maxDisplayItems / currentItems.length) * 100);
-            const maxPosition = 100 - handleHeight;
-            const handlePosition = (menuState.scrollOffset / (currentItems.length - menuState.maxDisplayItems)) * maxPosition;
+            scrollHandle.style.display = 'block';
+            const handleHeight = (menuState.maxDisplayItems / currentItems.length) * 100;
+            const handlePosition = (menuState.scrollOffset / (currentItems.length - menuState.maxDisplayItems)) * (100 - handleHeight);
             
             scrollHandle.style.height = handleHeight + '%';
-            scrollHandle.style.top = Math.max(0, Math.min(maxPosition, handlePosition)) + '%';
+            scrollHandle.style.top = handlePosition + '%';
         }
         
         function getCurrentItems() {
@@ -515,46 +506,39 @@
         // Macho DUI için özel input handling
         function machoDuiKeyHandler(key) {
             console.log('Macho DUI Key:', key);
-            
             const currentItems = getCurrentItems();
-            
             switch (key) {
                 case 'ArrowUp':
                 case 'Up':
-                    menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
-                    if (menuState.selectedIndex === -1) {
-                        menuState.selectedIndex = currentItems.length - 1;
-                    }
+                    menuState.selectedIndex = (menuState.selectedIndex - 1 + currentItems.length) % currentItems.length;
                     updateScrollOffset();
                     break;
-                    
                 case 'ArrowDown':
                 case 'Down':
-                    menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
-                    if (menuState.selectedIndex >= currentItems.length) {
-                        menuState.selectedIndex = 0;
-                    }
+                    menuState.selectedIndex = (menuState.selectedIndex + 1) % currentItems.length;
                     updateScrollOffset();
                     break;
-                    
                 case 'Enter':
                 case 'Return':
                 case 'Space':
                     handleEnterPress();
                     break;
-                    
                 case 'Backspace':
                 case 'Back':
                 case 'Escape':
                     if (menuState.level !== "main") {
+                        if (menuState.isSearching) {
+                            menuState.isSearching = false;
+                            menuState.searchQuery = "";
+                        }
                         menuState.level = "main";
-                        menuState.isSearching = false;
-                        menuState.searchQuery = "";
                         menuState.selectedSubCategory = 0;
                         resetSelection();
+                    } else {
+                        // Ana menüdeyken backspace'e basılırsa menüyü kapat
+                        sendMessageToLua({ type: 'close' });
                     }
                     break;
-                    
                 case 'KeyQ':
                 case 'Q':
                 case 'q':
@@ -562,15 +546,13 @@
                 case 'Left':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
-                        if (config) {
-                            menuState.selectedSubCategory = Math.max(0, menuState.selectedSubCategory - 1);
+                        if (config && config.subCategories.length > 1) {
+                            menuState.selectedSubCategory = (menuState.selectedSubCategory - 1 + config.subCategories.length) % config.subCategories.length;
                             resetSelection();
                         }
-                    } else {
-                        handleSliderInput(false);
                     }
+                    handleSliderInput(false); // Slider/Clothing için de çalışır
                     break;
-                    
                 case 'KeyE':
                 case 'E':
                 case 'e':
@@ -578,16 +560,14 @@
                 case 'Right':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
-                        if (config) {
-                            menuState.selectedSubCategory = Math.min(config.subCategories.length - 1, menuState.selectedSubCategory + 1);
+                        if (config && config.subCategories.length > 1) {
+                            menuState.selectedSubCategory = (menuState.selectedSubCategory + 1) % config.subCategories.length;
                             resetSelection();
                         }
-                    } else {
-                        handleSliderInput(true);
                     }
+                    handleSliderInput(true); // Slider/Clothing için de çalışır
                     break;
             }
-            
             render();
             return true; // Indicate handled
         }
