@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FiveM Menu</title>
+    <style>
+        body {
+            margin: 0;
+            background: transparent;
+            font-family: Arial;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .menu {
+            background: rgba(0,0,0,0.85);
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 300px;
+            border: 2px solid #00ff88;
+        }
+        
+        .title {
+            color: #00ff88;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #333, #555);
+            color: white;
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            padding: 12px 20px;
+            margin: 5px 0;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
+        }
+        
+        .close {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <div class="title">🎮 MENÜ</div>
+        
+        <button class="btn" onclick="action('heal')">💊 Can Yenile</button>
+        <button class="btn" onclick="action('weapon')">🔫 Silah Ver</button>
+        <button class="btn" onclick="action('car')">🚗 Araç Spawn</button>
+        <button class="btn" onclick="action('tp_airport')">✈️ Havaalanına TP</button>
+        <button class="btn" onclick="action('noclip')">👻 NoClip</button>
+        <button class="btn" onclick="action('godmode')">🛡️ God Mode</button>
+        
+        <button class="btn close" onclick="closeMenu()">❌ Kapat</button>
+    </div>
+
+    <script>
+        function action(cmd) {
+            // Lua'ya mesaj gönder
+            parent.postMessage({
+                type: 'action',
+                command: cmd
+            }, '*');
+            
+            console.log('Komut:', cmd);
+        }
+        
+        function closeMenu() {
+            parent.postMessage({
+                type: 'close'
+            }, '*');
+        }
+        
+        // ESC ile kapat
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
+        });
+        
+        console.log('Menü hazır!');
+    </script>
+</body>
+</html>
