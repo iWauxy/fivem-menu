@@ -19,9 +19,17 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
-            /* Macho DUI için ekstra şeffaflık */
+            /* Tam şeffaflık için */
             -webkit-app-region: no-drag;
+            position: relative;
+        }
+        
+        /* Arka plan tamamen şeffaf */
+        html::before, html::after, 
+        body::before, body::after {
+            display: none !important;
         }
         
         .menu-container {
@@ -98,23 +106,84 @@
             border-radius: 8px;
             color: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(100, 150, 255, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
-            transform: translateX(-5px);
+            transform: translateX(-8px) scale(0.98);
             opacity: 0.7;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(180deg, rgba(100, 150, 255, 0.8), rgba(50, 100, 200, 0.8));
+            transform: translateX(-3px);
+            transition: all 0.4s ease;
         }
         
         .menu-item.selected {
-            background: linear-gradient(135deg, rgba(50, 100, 200, 0.8), rgba(100, 150, 255, 0.8));
+            background: linear-gradient(135deg, rgba(50, 100, 200, 0.85), rgba(100, 150, 255, 0.85));
             color: white;
             border-color: rgba(100, 150, 255, 0.9);
-            box-shadow: 0 0 20px rgba(100, 150, 255, 0.5);
-            transform: translateX(0px) scale(1.02);
+            box-shadow: 0 0 25px rgba(100, 150, 255, 0.5);
+            transform: translateX(0px) scale(1.03);
             opacity: 1;
+            animation: selectedPulse 2s ease-in-out infinite;
+        }
+        
+        .menu-item.selected::before {
+            transform: translateX(0px);
+            width: 4px;
+            box-shadow: 0 0 10px rgba(100, 150, 255, 0.8);
+        }
+        
+        @keyframes selectedPulse {
+            0%, 100% {
+                box-shadow: 0 0 25px rgba(100, 150, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(100, 150, 255, 0.7);
+            }
+        }
+        
+        /* Smooth scrolling animation */
+        .menu-item.slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .menu-item.slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(10px) translateX(-8px) scale(0.98);
+                opacity: 0.3;
+            }
+            to {
+                transform: translateY(0) translateX(-8px) scale(0.98);
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-10px) translateX(-8px) scale(0.98);
+                opacity: 0.3;
+            }
+            to {
+                transform: translateY(0) translateX(-8px) scale(0.98);
+                opacity: 0.7;
+            }
         }
         
         .menu-item .icon {
@@ -382,13 +451,19 @@
                 return;
             }
             
+            // Seçili öğe görünür alanda mı kontrol et
             if (menuState.selectedIndex < menuState.scrollOffset) {
+                // Yukarı scroll
                 menuState.scrollOffset = menuState.selectedIndex;
             } else if (menuState.selectedIndex >= menuState.scrollOffset + menuState.maxDisplayItems) {
+                // Aşağı scroll
                 menuState.scrollOffset = menuState.selectedIndex - menuState.maxDisplayItems + 1;
             }
             
+            // Sınırları kontrol et
             menuState.scrollOffset = Math.max(0, Math.min(menuState.scrollOffset, totalItems - menuState.maxDisplayItems));
+            
+            console.log(`Scroll: ${menuState.scrollOffset}, Selected: ${menuState.selectedIndex}, Total: ${totalItems}`);
         }
         
         function resetSelection() {
@@ -504,33 +579,34 @@
             renderMenuItems();
         }
         
-        // Macho DUI için özel input handling
+        // Macho DUI için özel input handling - Geliştirilmiş
         function machoDuiKeyHandler(key) {
             console.log('Macho DUI Key:', key);
             
             const currentItems = getCurrentItems();
+            const oldIndex = menuState.selectedIndex;
             
             switch (key) {
                 case 'ArrowUp':
                 case 'Up':
-                case 'W':
-                case 'w':
                     menuState.selectedIndex = Math.max(0, menuState.selectedIndex - 1);
-                    if (menuState.selectedIndex === -1) {
+                    // Wrap around: en üstteyken yukarı gidince en aşağıya git
+                    if (menuState.selectedIndex === 0 && oldIndex === 0) {
                         menuState.selectedIndex = currentItems.length - 1;
                     }
                     updateScrollOffset();
+                    addScrollAnimation('slide-up');
                     break;
                     
                 case 'ArrowDown':
                 case 'Down':
-                case 'S':
-                case 's':
                     menuState.selectedIndex = Math.min(currentItems.length - 1, menuState.selectedIndex + 1);
-                    if (menuState.selectedIndex >= currentItems.length) {
+                    // Wrap around: en alttayken aşağı gidince en yukarı git
+                    if (menuState.selectedIndex === currentItems.length - 1 && oldIndex === currentItems.length - 1) {
                         menuState.selectedIndex = 0;
                     }
                     updateScrollOffset();
+                    addScrollAnimation('slide-down');
                     break;
                     
                 case 'Enter':
@@ -551,13 +627,10 @@
                     }
                     break;
                     
+                // Sadece Q ve E ile yatay hareket
                 case 'KeyQ':
                 case 'Q':
                 case 'q':
-                case 'ArrowLeft':
-                case 'Left':
-                case 'A':
-                case 'a':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -572,10 +645,6 @@
                 case 'KeyE':
                 case 'E':
                 case 'e':
-                case 'ArrowRight':
-                case 'Right':
-                case 'D':
-                case 'd':
                     if (menuState.level !== "main" && menuState.level !== "search") {
                         const config = categoryConfigs[menuState.level];
                         if (config) {
@@ -586,10 +655,37 @@
                         handleSliderInput(true);
                     }
                     break;
+                    
+                // Sol/Sağ ok tuşları da slider için
+                case 'ArrowLeft':
+                case 'Left':
+                    handleSliderInput(false);
+                    break;
+                    
+                case 'ArrowRight':
+                case 'Right':
+                    handleSliderInput(true);
+                    break;
             }
             
             render();
             return true; // Indicate handled
+        }
+        
+        // Scroll animasyonu ekleme
+        function addScrollAnimation(animClass) {
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.classList.remove('slide-up', 'slide-down');
+                item.classList.add(animClass);
+            });
+            
+            // Animasyonu temizle
+            setTimeout(() => {
+                menuItems.forEach(item => {
+                    item.classList.remove(animClass);
+                });
+            }, 300);
         }
         
         function handleEnterPress() {
