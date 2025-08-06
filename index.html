@@ -617,18 +617,30 @@
             }
 
             bindEvents() {
-                // Keyboard navigation
-                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
-                
-                // Search input
+                // Window message listener for Lua communication (FiveM)
+                window.addEventListener('message', (event) => {
+                    this.handleLuaMessage(event.data);
+                });
+
+                // Search input handling
                 const searchInput = document.getElementById('searchInput');
                 if (searchInput) {
                     searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+                    searchInput.addEventListener('keydown', (e) => {
+                        e.stopPropagation(); // Prevent event bubbling to Lua
+                    });
                 }
 
-                // Window message listener for Lua communication
-                window.addEventListener('message', (event) => {
-                    this.handleLuaMessage(event.data);
+                // Disable keyboard events in DUI - let Lua handle them
+                document.addEventListener('keydown', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+
+                // Send ready signal to Lua
+                this.sendToLua({
+                    type: 'ready',
+                    message: 'Menu HTML loaded and ready'
                 });
             }
 
@@ -1161,34 +1173,28 @@
 
             // Lua Communication
             sendToLua(data) {
-                // Method 1: PostMessage to parent (for NUI compatibility)
-                if (window.parent && window.parent.postMessage) {
+                // Send message to parent (FiveM)
+                console.log('Sending to Lua:', data);
+                
+                // Method 1: PostMessage to parent
+                if (window.parent !== window) {
                     window.parent.postMessage(data, '*');
                 }
                 
-                // Method 2: Fetch method (for some executors)
-                fetch(`https://nebula_message`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                }).catch(() => {
-                    // Fallback: Try command method
-                    this.sendCommand(`nebula_message ${JSON.stringify(data)}`);
-                });
+                // Method 2: Global function call (if available)
+                if (typeof SendNUIMessage !== 'undefined') {
+                    SendNUIMessage(data);
+                }
                 
-                console.log('Sent to Lua:', data);
-            }
-
-            sendCommand(command) {
-                // Some executors support direct command execution
+                // Method 3: Custom global (for some executors)
                 if (window.invokeNative) {
-                    window.invokeNative('EXECUTE_COMMAND', command);
+                    window.invokeNative('sendDuiMessage', JSON.stringify(data));
                 }
             }
 
             handleLuaMessage(data) {
+                console.log('Received from Lua:', data);
+                
                 switch(data.type) {
                     case 'updatePlayers':
                         this.onlinePlayers = data.players || [];
@@ -1211,8 +1217,56 @@
                         }
                         break;
                     case 'closeMenu':
-                        this.sendToLua({ type: 'close' });
+                        // Menu will be hidden by Lua
                         break;
+                    case 'navigate':
+                        this.handleNavigationFromLua(data);
+                        break;
+                    case 'setView':
+                        this.setViewFromLua(data);
+                        break;
+                }
+            }
+
+            handleNavigationFromLua(data) {
+                switch(data.direction) {
+                    case 'up':
+                        this.navigateUp();
+                        break;
+                    case 'down':
+                        this.navigateDown();
+                        break;
+                    case 'left':
+                        this.navigateLeft();
+                        break;
+                    case 'right':
+                        this.navigateRight();
+                        break;
+                    case 'enter':
+                        this.handleEnter();
+                        break;
+                    case 'back':
+                        this.handleBack();
+                        break;
+                    case 'tab_left':
+                        this.navigateSubCategoryLeft();
+                        break;
+                    case 'tab_right':
+                        this.navigateSubCategoryRight();
+                        break;
+                }
+            }
+
+            setViewFromLua(data) {
+                if (data.view === 'main') {
+                    this.loadMainCategories();
+                } else if (data.view === 'search') {
+                    this.loadSearchView();
+                } else if (data.view === 'category' && data.category) {
+                    this.currentCategory = data.category;
+                    this.currentSubCategory = data.subCategory || 0;
+                    this.selectedIndex = data.selectedIndex || 0;
+                    this.loadCategoryView();
                 }
             }
 
