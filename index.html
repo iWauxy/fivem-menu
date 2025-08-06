@@ -2,700 +2,388 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Phaze Menu</title>
+    <title>Heisenberg Menu</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-primary: #111827;
+            --bg-secondary: #1F2937;
+            --bg-tertiary: #374151;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #60a5fa;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
         body {
+            background: transparent;
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-primary);
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             overflow: hidden;
+            user-select: none;
         }
 
-        .menu-container {
-            background: rgba(0, 0, 0, 0.95);
-            border-radius: 8px;
-            width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Sol taraf progress indicator */
-        .progress-indicator {
+        .menu-wrapper {
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            background: rgba(52, 152, 219, 0.2);
+            left: 50px;
+            top: 50px;
+            width: 550px;
+            display: none; /* Initially hidden, controlled by JS */
+            flex-direction: row;
+            gap: 15px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
         }
 
-        .progress-bar {
-            width: 100%;
-            background: linear-gradient(180deg, #3498db, #2980b9);
-            transition: height 0.3s ease, top 0.3s ease;
-            border-radius: 0 2px 2px 0;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+        .menu-wrapper.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .main-container {
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            width: 250px;
         }
 
         .header {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            border-bottom: 2px solid #3498db;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 8px 8px 0 0;
         }
 
-        .logo {
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .category-list, .item-list {
+            list-style: none;
+            margin: 0;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
         }
 
-        .logo-icon {
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 25px solid #3498db;
-            position: relative;
+        .list-item:hover {
+            background-color: var(--bg-tertiary);
         }
 
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: -10px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 15px solid #5dade2;
+        .list-item.active {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--text-primary);
+            font-weight: 500;
         }
-
-        .logo-text {
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 2px 10px rgba(52, 152, 219, 0.5);
-        }
-
-        .menu-title {
-            background: rgba(0, 0, 0, 0.8);
-            color: #bdc3c7;
-            padding: 12px 25px;
-            font-size: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Yatay tab sistem */
-        .tab-container {
-            display: none;
-            background: rgba(0, 0, 0, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-container.active {
-            display: block;
+        
+        .sub-container {
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px_30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            width: 285px;
         }
 
         .tabs {
             display: flex;
+            background-color: var(--bg-secondary);
+            border-radius: 8px 8px 0 0;
+            padding: 5px;
             overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
         }
-
         .tabs::-webkit-scrollbar {
-            display: none;
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .tab {
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            text-align: center;
+            flex-grow: 1;
             cursor: pointer;
-            transition: all 0.2s ease;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.2s ease, color 0.2s ease;
             white-space: nowrap;
-            font-size: 13px;
-            color: #bdc3c7;
         }
-
+        
         .tab:hover {
-            background: rgba(52, 152, 219, 0.2);
+            background-color: var(--bg-tertiary);
         }
 
         .tab.active {
-            background: linear-gradient(90deg, #3498db, #2980b9);
-            color: white;
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
         }
 
-        .menu-items {
-            padding: 0;
-            list-style: none;
-            margin: 0;
-            max-height: 300px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #3498db transparent;
-        }
-
-        .menu-items::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .menu-items::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .menu-items::-webkit-scrollbar-thumb {
-            background: #3498db;
-            border-radius: 3px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 25px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 16px;
-        }
-
-        .menu-item:hover {
-            background: rgba(52, 152, 219, 0.1);
-        }
-
-        .menu-item.active {
-            background: linear-gradient(90deg, #3498db, #2980b9);
-            color: white;
-            font-weight: 500;
-        }
-
-        .menu-item .arrow {
-            color: #bdc3c7;
-            font-size: 18px;
-        }
-
-        .menu-item.active .arrow {
-            color: white;
-        }
-
-        .footer {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 10px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-
-        .build-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .search-icon {
-            background: #34495e;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .value-display {
+            color: var(--text-secondary);
             font-size: 14px;
         }
 
-        .page-info {
-            font-weight: bold;
+        .list-item.active .value-display {
+            color: var(--text-primary);
         }
-
-        .controls-hint {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
+        
+        .footer {
+            margin-top: auto;
             padding: 10px 15px;
-            border-radius: 5px;
             font-size: 12px;
-            color: #bdc3c7;
-            border: 1px solid rgba(52, 152, 219, 0.3);
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            border-radius: 0 0 8px 8px;
+            text-align: center;
         }
 
-        .back-button {
-            background: rgba(231, 76, 60, 0.8);
-            margin: 10px 25px;
-            border-radius: 5px;
-            display: none;
-        }
-
-        .back-button.show {
-            display: block;
-        }
-
-        /* Animasyonlar */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .menu-container {
-            animation: slideIn 0.3s ease-out;
-        }
     </style>
 </head>
 <body>
-    <div class="menu-container">
-        <!-- Progress Indicator -->
-        <div class="progress-indicator">
-            <div class="progress-bar" id="progressBar" style="height: 11.11%; top: 0;"></div>
-        </div>
 
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon"></div>
-                <div class="logo-text">Phaze</div>
+    <div class="menu-wrapper" id="menu-wrapper">
+        <div class="main-container">
+            <div class="header">
+                <h1 id="menu-title">Heisenberg</h1>
             </div>
+            <ul class="category-list" id="category-list">
+                </ul>
+             <div class="footer" id="main-footer"></div>
         </div>
-
-        <div class="menu-title" id="menuTitle">Main menu</div>
-
-        <!-- Yatay Tab Container -->
-        <div class="tab-container" id="tabContainer">
-            <div class="tabs" id="tabs">
-                <!-- Dinamik olarak eklenecek -->
-            </div>
+        <div class="sub-container" id="sub-container">
+             <div class="tabs" id="tabs">
+                </div>
+            <ul class="item-list" id="item-list">
+                 </ul>
+             <div class="footer" id="sub-footer"></div>
         </div>
-
-        <!-- Ana Menü -->
-        <ul class="menu-items" id="menuItems">
-            <li class="menu-item active" data-action="player" data-index="0">
-                <span>Player</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="server" data-index="1">
-                <span>Server</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="weapon" data-index="2">
-                <span>Weapon</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="combat" data-index="3">
-                <span>Combat</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="vehicle" data-index="4">
-                <span>Vehicle</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="visual" data-index="5">
-                <span>Visual</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="miscellaneous" data-index="6">
-                <span>Miscellaneous</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="settings" data-index="7">
-                <span>Settings</span>
-                <span class="arrow">»</span>
-            </li>
-            <li class="menu-item" data-action="search" data-index="8">
-                <span>Search</span>
-                <span class="arrow">»</span>
-            </li>
-        </ul>
-
-        <!-- Geri dönüş butonu -->
-        <div class="menu-item back-button" id="backButton">
-            <span>← Back to Main Menu</span>
-            <span class="arrow"></span>
-        </div>
-
-        <div class="footer">
-            <div class="build-info">
-                <div class="search-icon">🔍</div>
-                <span>Build: 262119</span>
-            </div>
-            <div class="page-info" id="pageInfo">1 / 9</div>
-        </div>
-    </div>
-
-    <div class="controls-hint">
-        ↑↓ Navigate • ←→ Switch Tab • Enter Select • ESC Close
     </div>
 
     <script>
-        let currentIndex = 0;
-        let currentTab = 0;
-        let menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
-        let isInSubMenu = false;
-        let currentCategory = '';
+        // --- STATE MANAGEMENT ---
+        let menuConfig = {};
+        let activeCategory = '';
+        let activeSubCategory = '';
+        let categoryIndex = 0;
+        let itemIndex = 0;
+        let menuVisible = false;
 
-        // Sub-menu verileri
-        const subMenuData = {
-            player: [
-                'God Mode', 'Infinite Health', 'Fast Run', 'Super Jump', 'Invisibility', 'No Fall Damage'
-            ],
-            server: [
-                'Change Weather', 'Set Time', 'Teleport All', 'Server Info', 'Player List', 'Admin Panel'
-            ],
-            weapon: [
-                'Give All Weapons', 'Infinite Ammo', 'No Recoil', 'Damage Modifier', 'Auto Reload', 'Silent Aim'
-            ],
-            combat: [
-                'Aimbot', 'ESP Players', 'No Spread', 'Auto Aim', 'Wallhack', 'Rage Mode'
-            ],
-            vehicle: [
-                'Spawn Vehicle', 'God Mode Vehicle', 'Super Speed', 'Fly Mode', 'Auto Repair', 'Boost'
-            ],
-            visual: [
-                'Crosshair', 'Player Names', 'Bone ESP', 'Radar', 'Night Vision', 'Thermal Vision'
-            ],
-            miscellaneous: [
-                'Teleport', 'Speed Hack', 'Fly Hack', 'Misc Options', 'Fun Stuff', 'Utilities'
-            ],
-            settings: [
-                'Key Bindings', 'Menu Settings', 'Config', 'Save/Load', 'Theme', 'Reset'
-            ]
+        // --- NUI MESSAGE HANDLING ---
+        const sendNuiMessage = (type, payload = {}) => {
+            fetch(`https://macho/${type}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.error("NUI Message Failed:", err));
         };
+        
+        window.addEventListener('message', (event) => {
+            const { type, payload } = event.data;
 
-        // Progress bar güncelle
-        function updateProgressBar() {
-            const totalItems = menuItems.length;
-            const progressHeight = (100 / totalItems);
-            const progressTop = (currentIndex / totalItems) * 100;
-            
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.height = progressHeight + '%';
-            progressBar.style.top = progressTop + '%';
-        }
+            if (type === 'show') {
+                menuConfig = payload.config;
+                activeCategory = Object.keys(menuConfig)[0];
+                activeSubCategory = menuConfig[activeCategory].subCategories[0];
+                categoryIndex = 0;
+                itemIndex = 0;
+                render();
+                document.getElementById('menu-wrapper').style.display = 'flex';
+                setTimeout(() => { 
+                    document.getElementById('menu-wrapper').classList.add('visible');
+                    menuVisible = true;
+                }, 10);
 
-        // Aktif öğeyi ayarla
-        function setActiveItem(index) {
-            menuItems.forEach(item => item.classList.remove('active'));
-            if (menuItems[index]) {
-                menuItems[index].classList.add('active');
-                updateProgressBar();
-            }
-        }
-
-        // Alt menüyü göster
-        function showSubMenu(category) {
-            if (!subMenuData[category]) return;
-            
-            isInSubMenu = true;
-            currentCategory = category;
-            currentTab = 0;
-            
-            // Başlığı güncelle
-            document.getElementById('menuTitle').textContent = category.charAt(0).toUpperCase() + category.slice(1) + ' menu';
-            
-            // Tab container'ı göster
-            const tabContainer = document.getElementById('tabContainer');
-            tabContainer.classList.add('active');
-            
-            // Tabları oluştur
-            const tabsContainer = document.getElementById('tabs');
-            tabsContainer.innerHTML = '';
-            
-            subMenuData[category].forEach((item, index) => {
-                const tab = document.createElement('div');
-                tab.className = 'tab' + (index === 0 ? ' active' : '');
-                tab.textContent = item;
-                tab.onclick = () => selectTab(index);
-                tabsContainer.appendChild(tab);
-            });
-            
-            // Menu items'ı güncelle
-            updateMenuItems();
-            
-            // Geri butonu göster
-            document.getElementById('backButton').classList.add('show');
-            
-            // Sayfa bilgisini güncelle
-            document.getElementById('pageInfo').textContent = `1 / ${subMenuData[category].length}`;
-        }
-
-        // Tab seçimi
-        function selectTab(tabIndex) {
-            currentTab = tabIndex;
-            
-            // Tab görünümünü güncelle
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach((tab, index) => {
-                tab.classList.toggle('active', index === tabIndex);
-            });
-            
-            // İçeriği güncelle
-            updateMenuItems();
-        }
-
-        // Menu items güncelle
-        function updateMenuItems() {
-            const menuContainer = document.getElementById('menuItems');
-            menuContainer.innerHTML = '';
-            
-            if (isInSubMenu && subMenuData[currentCategory]) {
-                const selectedItem = subMenuData[currentCategory][currentTab];
-                
-                // Seçili kategorinin alt seçeneklerini göster
-                const subOptions = getSubOptions(selectedItem);
-                
-                subOptions.forEach((option, index) => {
-                    const li = document.createElement('li');
-                    li.className = 'menu-item' + (index === 0 ? ' active' : '');
-                    li.setAttribute('data-action', option.action);
-                    li.setAttribute('data-index', index);
-                    li.innerHTML = `
-                        <span>${option.name}</span>
-                        <span class="arrow">»</span>
-                    `;
-                    menuContainer.appendChild(li);
-                });
-                
-                // Menu items'ı güncelle
-                menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
-                currentIndex = 0;
-                setActiveItem(0);
-            }
-        }
-
-        // Alt seçenekleri al
-        function getSubOptions(category) {
-            const options = {
-                'God Mode': [
-                    {name: 'Enable God Mode', action: 'god_mode_on'},
-                    {name: 'Disable God Mode', action: 'god_mode_off'},
-                    {name: 'Toggle God Mode', action: 'god_mode_toggle'}
-                ],
-                'Infinite Health': [
-                    {name: 'Max Health', action: 'max_health'},
-                    {name: 'Max Armor', action: 'max_armor'},
-                    {name: 'Both', action: 'max_both'}
-                ],
-                'Change Weather': [
-                    {name: 'Clear', action: 'weather_clear'},
-                    {name: 'Rain', action: 'weather_rain'},
-                    {name: 'Thunder', action: 'weather_thunder'},
-                    {name: 'Snow', action: 'weather_snow'}
-                ],
-                'Spawn Vehicle': [
-                    {name: 'Adder', action: 'spawn_adder'},
-                    {name: 'Zentorno', action: 'spawn_zentorno'},
-                    {name: 'T20', action: 'spawn_t20'},
-                    {name: 'Custom', action: 'spawn_custom'}
-                ]
-            };
-            
-            return options[category] || [
-                {name: 'Option 1', action: 'option1'},
-                {name: 'Option 2', action: 'option2'},
-                {name: 'Option 3', action: 'option3'}
-            ];
-        }
-
-        // Ana menüye dön
-        function returnToMainMenu() {
-            isInSubMenu = false;
-            currentCategory = '';
-            currentIndex = 0;
-            
-            // Başlığı sıfırla
-            document.getElementById('menuTitle').textContent = 'Main menu';
-            
-            // Tab container'ı gizle
-            document.getElementById('tabContainer').classList.remove('active');
-            
-            // Ana menü items'ını yükle
-            const menuContainer = document.getElementById('menuItems');
-            menuContainer.innerHTML = `
-                <li class="menu-item active" data-action="player" data-index="0">
-                    <span>Player</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="server" data-index="1">
-                    <span>Server</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="weapon" data-index="2">
-                    <span>Weapon</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="combat" data-index="3">
-                    <span>Combat</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="vehicle" data-index="4">
-                    <span>Vehicle</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="visual" data-index="5">
-                    <span>Visual</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="miscellaneous" data-index="6">
-                    <span>Miscellaneous</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="settings" data-index="7">
-                    <span>Settings</span>
-                    <span class="arrow">»</span>
-                </li>
-                <li class="menu-item" data-action="search" data-index="8">
-                    <span>Search</span>
-                    <span class="arrow">»</span>
-                </li>
-            `;
-            
-            // Menu items güncelle
-            menuItems = document.querySelectorAll('.menu-item:not(.back-button)');
-            setActiveItem(0);
-            
-            // Geri butonu gizle
-            document.getElementById('backButton').classList.remove('show');
-            
-            // Sayfa bilgisini güncelle
-            document.getElementById('pageInfo').textContent = '1 / 9';
-        }
-
-        // Keyboard kontrolleri
-        document.addEventListener('keydown', function(e) {
-            e.preventDefault();
-            
-            switch(e.key) {
-                case 'ArrowUp':
-                    if (isInSubMenu) {
-                        currentIndex = Math.max(0, currentIndex - 1);
-                        setActiveItem(currentIndex);
-                    } else {
-                        currentIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
-                        setActiveItem(currentIndex);
-                    }
-                    break;
-                    
-                case 'ArrowDown':
-                    if (isInSubMenu) {
-                        currentIndex = Math.min(menuItems.length - 1, currentIndex + 1);
-                        setActiveItem(currentIndex);
-                    } else {
-                        currentIndex = (currentIndex + 1) % menuItems.length;
-                        setActiveItem(currentIndex);
-                    }
-                    break;
-                    
-                case 'ArrowLeft':
-                    if (isInSubMenu) {
-                        const totalTabs = document.querySelectorAll('.tab').length;
-                        currentTab = (currentTab - 1 + totalTabs) % totalTabs;
-                        selectTab(currentTab);
-                    }
-                    break;
-                    
-                case 'ArrowRight':
-                    if (isInSubMenu) {
-                        const totalTabs = document.querySelectorAll('.tab').length;
-                        currentTab = (currentTab + 1) % totalTabs;
-                        selectTab(currentTab);
-                    }
-                    break;
-                    
-                case 'Enter':
-                    selectCurrentItem();
-                    break;
-                    
-                case 'Escape':
-                    if (isInSubMenu) {
-                        returnToMainMenu();
-                    } else {
-                        closeMenu();
-                    }
-                    break;
+            } else if (type === 'hide') {
+                document.getElementById('menu-wrapper').classList.remove('visible');
+                 setTimeout(() => { 
+                    document.getElementById('menu-wrapper').style.display = 'none';
+                    menuVisible = false;
+                }, 300);
             }
         });
 
-        // Mevcut öğeyi seç
-        function selectCurrentItem() {
-            if (isInSubMenu) {
-                const activeItem = menuItems[currentIndex];
-                if (activeItem) {
-                    const action = activeItem.getAttribute('data-action');
-                    
-                    parent.postMessage({
-                        type: 'menuAction',
-                        action: action,
-                        category: currentCategory
-                    }, '*');
-                    
-                    console.log('Sub-menu action:', action);
-                }
-            } else {
-                const activeItem = menuItems[currentIndex];
-                const action = activeItem.getAttribute('data-action');
-                
-                if (action === 'search') {
-                    parent.postMessage({
-                        type: 'menuAction',
-                        action: 'search'
-                    }, '*');
-                } else {
-                    showSubMenu(action);
-                }
-            }
-        }
-
-        // Geri butonu
-        document.getElementById('backButton').onclick = returnToMainMenu;
-
-        // Mouse kontrolleri
-        function setupMouseEvents() {
-            menuItems.forEach((item, index) => {
-                item.addEventListener('mouseenter', () => {
-                    currentIndex = index;
-                    setActiveItem(currentIndex);
-                });
-                
-                item.addEventListener('click', () => {
-                    selectCurrentItem();
-                });
+        // --- RENDER FUNCTIONS ---
+        const render = () => {
+            if (!activeCategory || !menuConfig[activeCategory]) return;
+            renderCategories();
+            renderSubCategories();
+            renderItems();
+            updateFooters();
+        };
+        
+        const renderCategories = () => {
+            const catList = document.getElementById('category-list');
+            catList.innerHTML = '';
+            Object.keys(menuConfig).forEach((catName, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                if (index === categoryIndex) li.classList.add('active');
+                li.textContent = catName;
+                catList.appendChild(li);
             });
-        }
+        };
 
-        // Menü kapatma
-        function closeMenu() {
-            parent.postMessage({
-                type: 'closeMenu'
-            }, '*');
-        }
+        const renderSubCategories = () => {
+            const tabs = document.getElementById('tabs');
+            tabs.innerHTML = '';
+            const subCategories = menuConfig[activeCategory].subCategories;
+            const subCategoryIdx = subCategories.indexOf(activeSubCategory);
 
-        // Initialize
-        setActiveItem(0);
-        setupMouseEvents();
+            subCategories.forEach((subCatName, index) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab';
+                if (index === subCategoryIdx) tab.classList.add('active');
+                tab.textContent = subCatName;
+                tabs.appendChild(tab);
+            });
+        };
 
-        console.log('🎮 Gelişmiş Phaze Menu yüklendi!');
-        console.log('🎯 Kontroller: ↑↓ Navigate, ←→ Tab Switch, Enter Select, ESC Close/Back');
+        const renderItems = () => {
+            const itemList = document.getElementById('item-list');
+            itemList.innerHTML = '';
+            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
+
+            if (items.length === 0) {
+                itemList.innerHTML = '<li class="list-item">No items in this category.</li>';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                if (index === itemIndex) li.classList.add('active');
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = item.name;
+
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'value-display';
+
+                switch (item.type) {
+                    case 'toggle':
+                        valueSpan.textContent = item.value ? 'ON' : 'OFF';
+                        break;
+                    case 'slider':
+                        valueSpan.textContent = `< ${item.value.toFixed(2)} >`;
+                        break;
+                    case 'button':
+                        valueSpan.textContent = 'Execute';
+                        break;
+                    default:
+                         valueSpan.textContent = '>';
+                }
+
+                li.appendChild(nameSpan);
+                li.appendChild(valueSpan);
+                itemList.appendChild(li);
+            });
+        };
+
+        const updateFooters = () => {
+            document.getElementById('main-footer').textContent = `${categoryIndex + 1} / ${Object.keys(menuConfig).length}`;
+            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
+            document.getElementById('sub-footer').textContent = items.length > 0 ? `${itemIndex + 1} / ${items.length}` : '0 / 0';
+        };
+
+
+        // --- KEYBOARD INPUT HANDLING ---
+        document.addEventListener('keydown', (e) => {
+            if (!menuVisible) return;
+            
+            e.preventDefault();
+
+            const categories = Object.keys(menuConfig);
+            const subCategories = menuConfig[activeCategory].subCategories;
+            const items = menuConfig[activeCategory].items.filter(item => item.subCategory === activeSubCategory);
+            const currentItem = items[itemIndex];
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    itemIndex = (itemIndex - 1 + items.length) % items.length;
+                    break;
+                case 'ArrowDown':
+                    itemIndex = (itemIndex + 1) % items.length;
+                    break;
+                case 'PageUp': // Kategoriler arasında yukarı git
+                    categoryIndex = (categoryIndex - 1 + categories.length) % categories.length;
+                    activeCategory = categories[categoryIndex];
+                    activeSubCategory = menuConfig[activeCategory].subCategories[0];
+                    itemIndex = 0;
+                    break;
+                case 'PageDown': // Kategoriler arasında aşağı git
+                    categoryIndex = (categoryIndex + 1) % categories.length;
+                    activeCategory = categories[categoryIndex];
+                    activeSubCategory = menuConfig[activeCategory].subCategories[0];
+                    itemIndex = 0;
+                    break;
+                case 'ArrowLeft': {
+                    if (currentItem && currentItem.type === 'slider') {
+                        // Slider değeri azalt
+                        const step = (currentItem.max - currentItem.min) / 20;
+                        currentItem.value = Math.max(currentItem.min, currentItem.value - step);
+                        sendNuiMessage('updateItem', { category: activeCategory, itemName: currentItem.name, value: currentItem.value });
+                    } else {
+                        // Tab değiştir
+                        let subIndex = subCategories.indexOf(activeSubCategory);
+                        subIndex = (subIndex - 1 + subCategories.length) % subCategories.length;
+                        activeSubCategory = subCategories[subIndex];
+                        itemIndex = 0;
+                    }
+                    break;
+                }
+                case 'ArrowRight': {
+                     if (currentItem && currentItem.type === 'slider') {
+                        // Slider değeri artır
+                        const step = (currentItem.max - currentItem.min) / 20;
+                        currentItem.value = Math.min(currentItem.max, currentItem.value + step);
+                        sendNuiMessage('updateItem', { category: activeCategory, itemName: currentItem.name, value: currentItem.value });
+                    } else {
+                        // Tab değiştir
+                        let subIndex = subCategories.indexOf(activeSubCategory);
+                        subIndex = (subIndex + 1) % subCategories.length;
+                        activeSubCategory = subCategories[subIndex];
+                        itemIndex = 0;
+                    }
+                    break;
+                }
+                case 'Enter':
+                    if (currentItem) {
+                        sendNuiMessage('executeAction', { category: activeCategory, itemName: currentItem.name });
+                        if(currentItem.type === 'toggle') {
+                             currentItem.value = !currentItem.value; // Anında UI tepkisi için
+                        }
+                    }
+                    break;
+                case 'Escape':
+                    sendNuiMessage('closeMenu');
+                    break;
+            }
+            render();
+        });
     </script>
 </body>
 </html>
