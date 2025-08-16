@@ -81,18 +81,27 @@
 
         // Lua'dan gelen tuş mesajlarını dinle
         window.addEventListener('message', (event) => {
+            console.log('Received message:', event.data); // Debug
             const data = JSON.parse(event.data);
             
             if (data.type === 'keypress') {
+                console.log('Key pressed:', data.key); // Debug
+                
                 if (data.key === 'ArrowDown') {
                     menuItems[selectedIndex].classList.remove('selected');
                     selectedIndex = (selectedIndex + 1) % menuItems.length;
                     menuItems[selectedIndex].classList.add('selected');
+                    console.log('Selected index:', selectedIndex);
                 } else if (data.key === 'ArrowUp') {
                     menuItems[selectedIndex].classList.remove('selected');
                     selectedIndex = (selectedIndex - 1 + menuItems.length) % menuItems.length;
                     menuItems[selectedIndex].classList.add('selected');
+                    console.log('Selected index:', selectedIndex);
+                } else if (data.key === 'ArrowLeft' || data.key === 'ArrowRight') {
+                    // Sağ/Sol tuşları için şimdilik log
+                    console.log('Left/Right arrow pressed');
                 } else if (data.key === 'Enter') {
+                    console.log('Enter - clicking item');
                     menuItems[selectedIndex].click();
                 }
             }
