@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nebula Menu</title>
+    <title>Phaze Menu</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,7 +57,7 @@
 </head>
 <body>
     <div class="menu-container">
-        <div class="menu-header">nebula</div>
+        <div class="menu-header">Nebula</div>
         <ul class="menu-list">
             <li class="menu-item">Main Menu <span class="submenu-indicator">></span></li>
             <li class="menu-item">Player <span class="submenu-indicator">></span></li>
@@ -78,34 +78,7 @@
 
         // İlk item'ı seçili yap
         menuItems[selectedIndex].classList.add('selected');
-
-        // Lua'dan gelen tuş mesajlarını dinle
-        window.addEventListener('message', (event) => {
-            console.log('Received message:', event.data); // Debug
-            const data = JSON.parse(event.data);
-            
-            if (data.type === 'keypress') {
-                console.log('Key pressed:', data.key); // Debug
-                
-                if (data.key === 'ArrowDown') {
-                    menuItems[selectedIndex].classList.remove('selected');
-                    selectedIndex = (selectedIndex + 1) % menuItems.length;
-                    menuItems[selectedIndex].classList.add('selected');
-                    console.log('Selected index:', selectedIndex);
-                } else if (data.key === 'ArrowUp') {
-                    menuItems[selectedIndex].classList.remove('selected');
-                    selectedIndex = (selectedIndex - 1 + menuItems.length) % menuItems.length;
-                    menuItems[selectedIndex].classList.add('selected');
-                    console.log('Selected index:', selectedIndex);
-                } else if (data.key === 'ArrowLeft' || data.key === 'ArrowRight') {
-                    // Sağ/Sol tuşları için şimdilik log
-                    console.log('Left/Right arrow pressed');
-                } else if (data.key === 'Enter') {
-                    console.log('Enter - clicking item');
-                    menuItems[selectedIndex].click();
-                }
-            }
-        });
+        console.log('Menu initialized, selected index:', selectedIndex);
 
         // Mouse etkileşimi
         menuItems.forEach((item, index) => {
@@ -127,6 +100,7 @@
                 menuItems[selectedIndex].classList.remove('selected');
                 selectedIndex = index;
                 menuItems[selectedIndex].classList.add('selected');
+                console.log('Mouse over - Selected index:', selectedIndex);
             });
         });
     </script>
