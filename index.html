@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: transparent; /* DUI için şeffaf arka plan */
+            background-color: transparent;
             color: white;
             margin: 0;
             padding: 0;
@@ -15,16 +15,16 @@
         }
         .menu-container {
             position: absolute;
-            top: 50px; /* Görseldeki gibi üstte konumlandır */
+            top: 50px;
             left: 50px;
             width: 300px;
-            background-color: rgba(0, 0, 0, 0.7); /* Karanlık yarı şeffaf arka plan */
-            border: 1px solid #00bfff; /* Mavi kenar */
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00bfff;
             border-radius: 5px;
             overflow: hidden;
         }
         .menu-header {
-            background-color: #00bfff; /* Mavi başlık */
+            background-color: #00bfff;
             padding: 10px;
             text-align: center;
             font-size: 24px;
@@ -56,7 +56,6 @@
     </style>
 </head>
 <body>
-    <!-- Ana Menü -->
     <div class="menu-container">
         <div class="menu-header">Phaze</div>
         <ul class="menu-list">
@@ -77,46 +76,49 @@
         const menuItems = document.querySelectorAll('.menu-item');
         let selectedIndex = 0;
 
-        // Başlangıçta ilk item'ı seçili yap
+        // İlk item'ı seçili yap
         menuItems[selectedIndex].classList.add('selected');
 
-        // Klavye navigasyonu
-        document.addEventListener('keydown', (event) => {
-            event.preventDefault(); // Oyun input'unu engelle ki focus kalmasın
-            if (event.key === 'ArrowDown') {
-                menuItems[selectedIndex].classList.remove('selected');
-                selectedIndex = (selectedIndex + 1) % menuItems.length;
-                menuItems[selectedIndex].classList.add('selected');
-            } else if (event.key === 'ArrowUp') {
-                menuItems[selectedIndex].classList.remove('selected');
-                selectedIndex = (selectedIndex - 1 + menuItems.length) % menuItems.length;
-                menuItems[selectedIndex].classList.add('selected');
-            } else if (event.key === 'Enter') {
-                // Seçili item'a tıkla simüle et
-                menuItems[selectedIndex].click();
+        // Lua'dan gelen tuş mesajlarını dinle
+        window.addEventListener('message', (event) => {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'keypress') {
+                if (data.key === 'ArrowDown') {
+                    menuItems[selectedIndex].classList.remove('selected');
+                    selectedIndex = (selectedIndex + 1) % menuItems.length;
+                    menuItems[selectedIndex].classList.add('selected');
+                } else if (data.key === 'ArrowUp') {
+                    menuItems[selectedIndex].classList.remove('selected');
+                    selectedIndex = (selectedIndex - 1 + menuItems.length) % menuItems.length;
+                    menuItems[selectedIndex].classList.add('selected');
+                } else if (data.key === 'Enter') {
+                    menuItems[selectedIndex].click();
+                }
             }
         });
 
-        // Mouse etkileşimi (hala aktif)
+        // Mouse etkileşimi
         menuItems.forEach((item, index) => {
             item.addEventListener('click', () => {
-                // Lua'ya mesaj göndermek için postMessage kullan (Lua entegrasyonu için hazır)
-                window.postMessage({ type: 'menuClick', item: item.textContent.trim().replace(' >', '') });
+                // Lua'ya menü tıklamasını bildir
+                fetch(`https://${GetParentResourceName()}/menuAction`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify({
+                        action: item.textContent.trim().replace(' >', '').toLowerCase()
+                    })
+                });
                 console.log('Clicked: ' + item.textContent);
             });
+            
             item.addEventListener('mouseover', () => {
                 menuItems[selectedIndex].classList.remove('selected');
                 selectedIndex = index;
                 menuItems[selectedIndex].classList.add('selected');
             });
-        });
-
-        // Lua'dan mesaj alma (örneğin menü güncellemesi için)
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'updateMenu') {
-                console.log('Received from Lua:', event.data);
-                // Burada menüyü dinamik güncelleyebiliriz
-            }
         });
     </script>
 </body>
