@@ -82,6 +82,7 @@
 
         // Klavye navigasyonu
         document.addEventListener('keydown', (event) => {
+            event.preventDefault(); // Oyun input'unu engelle ki focus kalmasın
             if (event.key === 'ArrowDown') {
                 menuItems[selectedIndex].classList.remove('selected');
                 selectedIndex = (selectedIndex + 1) % menuItems.length;
