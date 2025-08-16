@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phaze Menu</title>
+    <title>Nebula Menu</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,6 +22,7 @@
             border: 1px solid #00bfff;
             border-radius: 5px;
             overflow: hidden;
+            display: none;
         }
         .menu-header {
             background-color: #00bfff;
@@ -44,7 +45,7 @@
             align-items: center;
             transition: background-color 0.2s;
         }
-        .menu-item:hover, .menu-item.selected {
+        .menu-item.selected {
             background-color: rgba(255, 255, 255, 0.1);
         }
         .menu-item:last-child {
@@ -56,53 +57,58 @@
     </style>
 </head>
 <body>
-    <div class="menu-container">
+    <div class="menu-container" id="menuContainer">
         <div class="menu-header">Nebula</div>
-        <ul class="menu-list">
-            <li class="menu-item">Main Menu <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Player <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Server <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Weapon <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Combat <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Vehicle <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Visual <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Miscellaneous <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Settings <span class="submenu-indicator">></span></li>
-            <li class="menu-item">Search <span class="submenu-indicator">></span></li>
+        <ul class="menu-list" id="menuList">
+            <!-- Menü öğeleri Lua'dan enjekte edilecek -->
         </ul>
     </div>
 
     <script>
-        const menuItems = document.querySelectorAll('.menu-item');
+        // Basit global değişkenler
         let selectedIndex = 0;
+        let menuItems = [];
 
-        // İlk item'ı seçili yap
-        menuItems[selectedIndex].classList.add('selected');
-        console.log('Menu initialized, selected index:', selectedIndex);
+        // Debug için
+        console.log('DUI HTML loaded');
 
-        // Mouse etkileşimi
-        menuItems.forEach((item, index) => {
-            item.addEventListener('click', () => {
-                // Lua'ya menü tıklamasını bildir
-                fetch(`https://${GetParentResourceName()}/menuAction`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: JSON.stringify({
-                        action: item.textContent.trim().replace(' >', '').toLowerCase()
-                    })
-                });
-                console.log('Clicked: ' + item.textContent);
+        // Menüyü başlat (Lua'dan çağırılacak)
+        function initMenu(items) {
+            const menuList = document.getElementById('menuList');
+            const menuContainer = document.getElementById('menuContainer');
+            
+            menuList.innerHTML = '';
+            menuItems = items;
+            
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'menu-item';
+                li.innerHTML = `${item} <span class="submenu-indicator">></span>`;
+                if (index === 0) li.classList.add('selected');
+                menuList.appendChild(li);
             });
             
-            item.addEventListener('mouseover', () => {
-                menuItems[selectedIndex].classList.remove('selected');
-                selectedIndex = index;
-                menuItems[selectedIndex].classList.add('selected');
-                console.log('Mouse over - Selected index:', selectedIndex);
-            });
-        });
+            menuContainer.style.display = 'block';
+            selectedIndex = 0;
+            console.log('Menu initialized with', items.length, 'items');
+        }
+
+        // Menüyü gizle
+        function hideMenu() {
+            document.getElementById('menuContainer').style.display = 'none';
+            console.log('Menu hidden');
+        }
+
+        // Seçimi güncelle
+        function updateSelection(newIndex) {
+            const items = document.querySelectorAll('.menu-item');
+            if (items.length === 0) return;
+            
+            items[selectedIndex]?.classList.remove('selected');
+            selectedIndex = newIndex;
+            items[selectedIndex]?.classList.add('selected');
+            console.log('Selected item:', menuItems[selectedIndex]);
+        }
     </script>
 </body>
 </html>
