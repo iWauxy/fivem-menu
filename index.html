@@ -42,8 +42,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background-color 0.2s;
         }
-        .menu-item:hover {
+        .menu-item:hover, .menu-item.selected {
             background-color: rgba(255, 255, 255, 0.1);
         }
         .menu-item:last-child {
@@ -73,19 +74,47 @@
     </div>
 
     <script>
-        // Temel etkileşim için JS (Lua'dan mesajlarla genişletilebilir)
-        document.querySelectorAll('.menu-item').forEach(item => {
+        const menuItems = document.querySelectorAll('.menu-item');
+        let selectedIndex = 0;
+
+        // Başlangıçta ilk item'ı seçili yap
+        menuItems[selectedIndex].classList.add('selected');
+
+        // Klavye navigasyonu
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                menuItems[selectedIndex].classList.remove('selected');
+                selectedIndex = (selectedIndex + 1) % menuItems.length;
+                menuItems[selectedIndex].classList.add('selected');
+            } else if (event.key === 'ArrowUp') {
+                menuItems[selectedIndex].classList.remove('selected');
+                selectedIndex = (selectedIndex - 1 + menuItems.length) % menuItems.length;
+                menuItems[selectedIndex].classList.add('selected');
+            } else if (event.key === 'Enter') {
+                // Seçili item'a tıkla simüle et
+                menuItems[selectedIndex].click();
+            }
+        });
+
+        // Mouse etkileşimi (hala aktif)
+        menuItems.forEach((item, index) => {
             item.addEventListener('click', () => {
-                // Lua'ya mesaj göndermek için: window.postMessage({ type: 'menuClick', item: item.textContent });
+                // Lua'ya mesaj göndermek için postMessage kullan (Lua entegrasyonu için hazır)
+                window.postMessage({ type: 'menuClick', item: item.textContent.trim().replace(' >', '') });
                 console.log('Clicked: ' + item.textContent);
+            });
+            item.addEventListener('mouseover', () => {
+                menuItems[selectedIndex].classList.remove('selected');
+                selectedIndex = index;
+                menuItems[selectedIndex].classList.add('selected');
             });
         });
 
-        // Lua'dan mesaj alma örneği
+        // Lua'dan mesaj alma (örneğin menü güncellemesi için)
         window.addEventListener('message', (event) => {
             if (event.data.type === 'updateMenu') {
-                // Menüyü güncelle, örneğin yeni item ekle
                 console.log('Received from Lua:', event.data);
+                // Burada menüyü dinamik güncelleyebiliriz
             }
         });
     </script>
